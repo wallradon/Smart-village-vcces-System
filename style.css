@@ -1,0 +1,45 @@
+/* จัดให้อยู่กึ่งกลางหน้าจอและเอาจุดไข่ปลาออก */
+.villageUser {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto; /* Center ตัว <ul> ให้อยู่กลางจอ */
+    width: 60%; /* กำหนดความกว้างของกล่องทั้งหมด ปรับลด-เพิ่มได้ */
+    max-width: 600px; /* จำกัดความกว้างสูงสุดป้องกันการยืดเกินไปในจอใหญ่ */
+    li {
+        display: flex;
+        justify-content: space-between; /* ดัน <a> ทั้งสองตัวไปซ้าย-ขวาสุด */
+        background-color: black; /* สร้างแถบสีดำตรงกลางจากพื้นหลังของ <li> */
+        margin-top: 20px;
+        height: 45px; /* กำหนดความสูงของแถบ */
+        
+        a {
+            text-decoration: none; /* เอาขีดเส้นใต้ของ Link ออก */
+            display: flex;
+            align-items: center; /* จัดตัวอักษรให้อยู่กึ่งกลางแนวตั้ง */
+            justify-content: center; /* จัดตัวอักษรให้อยู่กึ่งกลางแนวนอน */
+            font-size: 1.2rem;
+        }
+    }
+}
+
+
+/* กำหนดความกว้างเฉพาะปุ่มฝั่งซ้าย (H1) */
+.villageUser li p:first-child {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    margin: 0;
+    color: rgb(255, 255, 255); /* สีตัวอักษรเป็นสีดำตามรูป */
+    width: 70%; /* กินพื้นที่ 40% ของแถว */
+}
+
+/* กำหนดความกว้างเฉพาะปุ่มฝั่งขวา (เพิ่มเติม) */
+.villageUser li a:last-child {
+    background-color: bisque;
+    border: solid 0.063rem black;
+    border-radius: 0.813rem;
+    margin: 0.313rem;
+    color: rgb(0, 0, 0); /* สีตัวอักษรเป็นสีดำตามรูป */
+    width: 25%; /* กินพื้นที่ 25% ของแถว (น้อยกว่าฝั่งซ้าย) */
+}
