@@ -1,19 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300&family=Pridi:wght@200;300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300&family=Pridi&family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+:root{
+    --color-primary: #002e5e;      
+    --color-secondary: #29356c;   
+    --color-bg: #fffded;          
+    --color-white: #ffffff;
+    --color-border: rgb(192, 192, 192);
+}
+
 body{
     margin: 0;
     padding: 0;
-    background-color: #fffded;
+    background-color: var(--color-bg);
     font-family: "Pridi", "Prompt", serif;
 }
-
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+}
 .page{
     display: none;
 }
 .page.active{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        display: block;
 }
 
 
@@ -21,7 +29,7 @@ header{
     box-sizing: border-box;
     display: flex;    
     align-items: center;
-    background-color: #29356c;
+    background-color: var(--color-primary);
     padding: 20px;
     height: 80px;
     img{
@@ -34,7 +42,7 @@ header{
     flex: 1;
     text-align: center;
     margin: 0;
-    color: white;
+    color: var(--color-white);
 }
 /* ----------------------main---------------------------- */
 .main-content{
@@ -43,12 +51,12 @@ header{
     min-height: calc(100vh - 80px);
     nav{
         
-        background-color: #002e5e;
+        background-color: var(--color-secondary);
         ul{
             padding: 0;
             li{
-                 background-color: white;
-                 color: #002e5e;
+                 background-color: var(--color-white);
+                 color: var(--color-primary);
                  text-align: center;
                  list-style-type:none ;
                  margin: 10px 5px;
@@ -57,24 +65,27 @@ header{
                  padding: 20px;
             }
             .user-select{
-                background-color: #002e5e;
-                color: white;
-                border:solid 2px  white;
+                background-color: var(--color-primary);
+                color: var(--color-white);
+                border:solid 2px  var(--color-white);
             }
         }
     }
     /* --------------------user-------------------   */
-    .user-details{
+    .user-details.active{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         .User,.headUserData{
             display: grid;
             grid-template-columns: 8rem 8rem 1fr;
             align-items: center ;
-            background-color: #002e5e;
+            background-color: var(--color-primary);
             margin: 10px;
             padding: 10px 20px;
             min-width: 930px;
             h2{
-                color: white;
+                color: var(--color-white);
                 margin: 0;
             }
             a{
@@ -82,17 +93,17 @@ header{
                 align-items: center;
                 justify-content: center;
                 justify-self: end;
-                background-color: white;
-                color: #002e5e;
+                background-color: var(--color-white);
+                color: var(--color-primary);
                 text-decoration: none;
-                border: solid 1px rgb(192, 192, 192);
+                border: solid 1px var(--color-white);
                 border-radius: 24px;
                 padding: 16px;
                 margin-right: 10px;
             }
         }
         .loading-text{
-            color: #002e5e;
+            color: var(--color-primary);
             text-align: center;
             font-size: 18px;
             padding: 20px;
@@ -100,5 +111,62 @@ header{
     }
 }
 
+/* user more details */
+
+.moreUserde.active{
+    .homeDetail{
+        display: flex;
+        flex-direction: column;
+        .homeNumber,.nameOwner{
+            display: flex;
+            flex-direction: row;
+            background-color: var(--color-primary);
+            margin: 1rem 1rem 0;
+            .homeList{
+                box-sizing: border-box;
+                color: var(--color-white);
+                padding: 20px;
+                font-weight: 600;
+                font-size: 1.125rem;
+            }
+        }
+    }
+    .vehicleUser{
+        margin-top: 10px;
+        .vehicleList{
+            margin: 1rem 1rem 0;
+            color: var(--color-white);;
+            background-color: var(--color-primary);
+            text-align: center;
+            padding: 10px 0;
+        }
+        .headVlist{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            align-items: center;
+            margin: 0.625rem 1rem 0;
+            background-color: var(--color-primary);
+            .Vlist{
+                color: var(--color-white);
+                padding: 10px;
+                margin: 0;
+                text-align: center;
+                font-size: 1.5rem;
+            }
+            a{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-decoration: none;
+                color: var(--color-primary);
+                background-color: var(--color-white);
+                border-radius: 14px;
+                padding: 16px;
+                margin: 10px 10px;
+            }
+        }
+
+    }
+}
 
 

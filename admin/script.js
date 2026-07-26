@@ -80,4 +80,55 @@ function renderUserPage() {
         updateData(userData);
     }
 }
+
+// moreDetails
+
+document.querySelector('#UserData').addEventListener('click', (e) => {
+    if (e.target.tagName === 'A') {
+        e.preventDefault();
+
+        const id = Number(e.target.dataset.id);
+        const user = userData.find(u => u.id === id); 
+        const pageUser = document.querySelector('#page-user');
+        const moreUserde = document.querySelector('.moreUserde');
+
+        pageUser.classList.remove('active'); //removeclass"active"
+        pageUser.classList.add('page'); //removeclass"active"
+        moreUserde.classList.remove('page'); //removeclass"active"
+        moreUserde.classList.add('active'); //removeclass"active"
+        console.log(user);
+
+        moreUserde.innerHTML = `
+            <section class="homeDetail">
+                <div class="homeNumber">
+                    <p class="homeList">เลขที่บ้าน</p>
+                    <p class="homeList">${user.id}</p>
+                </div>
+                <div class="nameOwner">
+                    <p class="homeList">ชื่อเจ้าบ้าน</p>
+                    <p class="homeList">${user.username}</p>
+                </div>
+            </section>
+            <section class="vehicleUser">
+                <h1 class="vehicleList">รายละเอียดยานพาหนะ</h1>
+                <div class="headVlist">
+                    <h3 class="Vlist">ป้ายทะเบียน</h3>
+                    <h3 class="Vlist">ประเภทยานพาหนะ</h3>
+                    <h3 class="Vlist"></h3>
+                </div>
+                <div class="headVlist">
+                    <p class="Vlist">${user.address.city}</p>
+                    <p class="Vlist">${user.address.zipcode}</p>
+                    <a href="">แสดงข้อมูลเพิ่มเติม</a>
+                </div>
+                <div class="headVlist">
+                    <p class="Vlist">${user.address.city}</p>
+                    <p class="Vlist">${user.address.zipcode}</p>
+                    <a href="">แสดงข้อมูลเพิ่มเติม</a>
+                </div>
+            </section>`;
+    }
+});
+
+
 lode(url);
