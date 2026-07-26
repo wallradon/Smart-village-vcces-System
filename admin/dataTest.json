@@ -1,0 +1,25 @@
+[
+  {
+    "id": 1,
+    "houseNumber": "158/1",
+    "ownerName": "สมหมาย ดีใจ",
+    "vehicles": [
+      { "plate": "1กข 1111", "type": "Car" },
+      { "plate": "2ขค 58", "type": "Motorcycle" }
+    ]
+  },
+  {
+    "id": 2,
+    "houseNumber": "158/2",
+    "ownerName": "สมชาย ใจดี",
+    "vehicles": [
+      { "plate": "กท 9999", "type": "Car" }
+    ]
+  },
+  {
+    "id": 3,
+    "houseNumber": "158/3",
+    "ownerName": "สมหญิง รักสงบ",
+    "vehicles": []
+  }
+]
