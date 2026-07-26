@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,18 +9,35 @@
 </head>
 
 <body>
-    <h1 style="text-align: center;">ข้อมูลลูกบ้าน</h1>
+    <header>
+        <img src="placeholder-300x300.png" alt="">
+        <h1 class="head-content">ระบบจัดการข้อมูลลูกบ้าน</h1>
 
-    <ul class="villageUser">
+    </header>
+    <main class="main-content">
+        <nav>
+            <ul>
+                <li data-target="home">HOME</li>
+                <li data-target="vehicle">VEHICLE DATA</li>
+                <li id="selectUs" data-target="user">USER DATA</li>
+            </ul>
+        </nav>
+        <!-- home -->
+        <section class="page" id="page-home"></section>
+        <!-- VEHICLE-->
+         <section class="page" id="page-vehicle"></section>
+        <!-- user data -->
+        <section class="page user-details" id="page-user">
+            <div class="headUserData">
+                <h2>ลำดับ</h2>
+                <h2>เลขที่บ้าน</h2>
+            </div>
+            <section id="UserData">
+                <p class="loading-text">กำลังโหลดข้อมูล...</p>
+            </section>
+        </section>
         
-        <!-- <li id="liMain">
-            <p>Home1</p>
-            <a href="">เพิ่มเติม</a>
-        </li> -->
-    </ul>
-    <div class="detailBox">
-        <p>คลิก "เพิ่มเติม" เพื่อดูรายละเอียด</p>
-    </div>
+    </main>
     <script src="script.js"></script>
 </body>
 

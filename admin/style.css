@@ -1,45 +1,104 @@
-/* จัดให้อยู่กึ่งกลางหน้าจอและเอาจุดไข่ปลาออก */
-.villageUser {
-    list-style: none;
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300&family=Pridi:wght@200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300&family=Pridi&family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+body{
+    margin: 0;
     padding: 0;
-    margin: 0 auto; /* Center ตัว <ul> ให้อยู่กลางจอ */
-    width: 60%; /* กำหนดความกว้างของกล่องทั้งหมด ปรับลด-เพิ่มได้ */
-    max-width: 600px; /* จำกัดความกว้างสูงสุดป้องกันการยืดเกินไปในจอใหญ่ */
-    li {
+    background-color: #fffded;
+    font-family: "Pridi", "Prompt", serif;
+}
+
+.page{
+    display: none;
+}
+.page.active{
         display: flex;
-        justify-content: space-between; /* ดัน <a> ทั้งสองตัวไปซ้าย-ขวาสุด */
-        background-color: black; /* สร้างแถบสีดำตรงกลางจากพื้นหลังของ <li> */
-        margin-top: 20px;
-        height: 45px; /* กำหนดความสูงของแถบ */
+        flex-direction: column;
+        align-items: center;
+}
+
+
+header{
+    box-sizing: border-box;
+    display: flex;    
+    align-items: center;
+    background-color: #29356c;
+    padding: 20px;
+    height: 80px;
+    img{
+        position: relative;
+        width: 4.375rem;
+    } 
+}
+
+.head-content{
+    flex: 1;
+    text-align: center;
+    margin: 0;
+    color: white;
+}
+/* ----------------------main---------------------------- */
+.main-content{
+    display: grid;
+    grid-template-columns: 18.75rem 1fr;
+    min-height: calc(100vh - 80px);
+    nav{
         
-        a {
-            text-decoration: none; /* เอาขีดเส้นใต้ของ Link ออก */
-            display: flex;
-            align-items: center; /* จัดตัวอักษรให้อยู่กึ่งกลางแนวตั้ง */
-            justify-content: center; /* จัดตัวอักษรให้อยู่กึ่งกลางแนวนอน */
-            font-size: 1.2rem;
+        background-color: #002e5e;
+        ul{
+            padding: 0;
+            li{
+                 background-color: white;
+                 color: #002e5e;
+                 text-align: center;
+                 list-style-type:none ;
+                 margin: 10px 5px;
+                 font-size: 20px;
+                 font-weight: 500;
+                 padding: 20px;
+            }
+            .user-select{
+                background-color: #002e5e;
+                color: white;
+                border:solid 2px  white;
+            }
+        }
+    }
+    /* --------------------user-------------------   */
+    .user-details{
+        .User,.headUserData{
+            display: grid;
+            grid-template-columns: 8rem 8rem 1fr;
+            align-items: center ;
+            background-color: #002e5e;
+            margin: 10px;
+            padding: 10px 20px;
+            min-width: 930px;
+            h2{
+                color: white;
+                margin: 0;
+            }
+            a{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                justify-self: end;
+                background-color: white;
+                color: #002e5e;
+                text-decoration: none;
+                border: solid 1px rgb(192, 192, 192);
+                border-radius: 24px;
+                padding: 16px;
+                margin-right: 10px;
+            }
+        }
+        .loading-text{
+            color: #002e5e;
+            text-align: center;
+            font-size: 18px;
+            padding: 20px;
         }
     }
 }
 
 
-/* กำหนดความกว้างเฉพาะปุ่มฝั่งซ้าย (H1) */
-.villageUser li p:first-child {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 18px;
-    margin: 0;
-    color: rgb(255, 255, 255); /* สีตัวอักษรเป็นสีดำตามรูป */
-    width: 70%; /* กินพื้นที่ 40% ของแถว */
-}
 
-/* กำหนดความกว้างเฉพาะปุ่มฝั่งขวา (เพิ่มเติม) */
-.villageUser li a:last-child {
-    background-color: bisque;
-    border: solid 0.063rem black;
-    border-radius: 0.813rem;
-    margin: 0.313rem;
-    color: rgb(0, 0, 0); /* สีตัวอักษรเป็นสีดำตามรูป */
-    width: 25%; /* กินพื้นที่ 25% ของแถว (น้อยกว่าฝั่งซ้าย) */
-}
