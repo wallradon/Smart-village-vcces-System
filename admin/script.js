@@ -10,19 +10,15 @@ let fetchStatus = 0;     // เก็บ HTTP status ของการ fetch �
 const navItems = document.querySelectorAll('nav li[data-target]');
 const pages = document.querySelectorAll('.page');
 
-/**
- * สลับไปแสดงหน้าที่ระบุ (target) และไฮไลต์เมนูที่เลือก
- * @param {string} target - ชื่อหน้า เช่น "home", "user", "userDetail", "vehicle"
- * @param {number|null} id - id ของ user (ใช้เฉพาะตอนเปิดหน้า userDetail)
- */
-function showPage(target, id) {
+
+function showPage(target, params) {
     pages.forEach(page => page.classList.remove('active'));        // ปิดทุกหน้าก่อน
     navItems.forEach(li => li.classList.remove('user-select'));    // เอาไฮไลต์เมนูออกก่อน
 
     const targetPage = document.querySelector(`#page-${target}`);
     if (targetPage) {
         targetPage.classList.add('active');   // เปิดเฉพาะหน้าที่ต้องการ
-        renderUserPage(target, id);           // สั่ง render เนื้อหาของหน้านั้น
+        renderUserPage(target, params);           // สั่ง render เนื้อหาของหน้านั้น
     }
 
     // ไฮไลต์เมนูที่ตรงกับหน้าปัจจุบัน (ทำงานได้ทั้งตอนคลิกเองและตอนเรียกจากโค้ด)
@@ -82,33 +78,13 @@ function refreshCurrentPage() {
     }
 }
 
-// ===================== Render หน้า USER DATA (list) =====================
-/**
- * สร้างรายการ user ทั้งหมดใส่ใน #UserData
- * (ตั้งค่า innerHTML ครั้งเดียวหลัง loop จบ เพื่อลด reflow/repaint)
- */
-function updateData(data) {
-    const UserData = document.querySelector('#UserData');
-    let div = "";
-    data.forEach(element => {
-        div += `
-        <div class="User">
-            <h2>${element.id}</h2>
-            <h2>${element.houseNumber}</h2>
-            <a href="#" data-id="${element.id}" data-target="userDetail">แสดงข้อมูลเพิ่มเติม</a>
-        </div>
-        `;
-    });
-    UserData.innerHTML = div;
-}
-
 // ===================== ตัวกลางตัดสินใจว่าจะ render อะไร =====================
 /**
  * ฟังก์ชันกลางที่เรียกทุกครั้งที่ต้อง render เนื้อหาในหน้าใดหน้าหนึ่ง
  * เช็คสถานะตามลำดับ: loading -> error -> success แล้วค่อยตัดสินใจว่า
  * จะ render ข้อมูลจริงของหน้านั้น (user / userDetail / vehicle / home)
  */
-function renderUserPage(target, id) {
+function renderUserPage(target, params) {
     // 1. หาหน้าที่กำลังเปิดอยู่
     const targetPage = document.querySelector(`#page-${target}`);
 
@@ -143,7 +119,9 @@ function renderUserPage(target, id) {
         updateData(mainData);
     } else if (target === "userDetail") {
         console.log(`Open moreDetailsUser`);
-        moreDetailsUser(Number(id));
+        moreDetailsUser(Number(params.id));
+    } else if (target === "vehicleDetail") {
+        vDetail(Number(params.id), Number(params.carIndex));
     } else if (target === "vehicle") {
         // ยังไม่ได้ทำ
     } else if (target === "home") {
@@ -151,11 +129,28 @@ function renderUserPage(target, id) {
     }
 }
 
-// ===================== Render หน้ารายละเอียด user =====================
+
+// ===================== Render หน้า USER DATA (list) =====================
 /**
- * แสดงรายละเอียดของ user คนเดียว (บ้าน, เจ้าของ, วันที่, ยานพาหนะ)
- * @param {number} id - id ของ user ที่ต้องการดูรายละเอียด
+ * สร้างรายการ user ทั้งหมดใส่ใน #UserData
+ * (ตั้งค่า innerHTML ครั้งเดียวหลัง loop จบ เพื่อลด reflow/repaint)
  */
+function updateData(data) {
+    const UserData = document.querySelector('#UserData');
+    let div = "";
+    data.forEach(element => {
+        div += `
+        <div class="User">
+            <h2>${element.id}</h2>
+            <h2>${element.houseNumber}</h2>
+            <a href="#" data-id="${element.id}" data-target="userDetail" >แสดงข้อมูลเพิ่มเติม</a>
+        </div>
+        `;
+    });
+    UserData.innerHTML = div;
+}
+// ===================== Render หน้ารายละเอียด user =====================
+
 function moreDetailsUser(id) {
     const user = mainData.find(u => u.id === id);
     const moreUserde = document.querySelector('#page-userDetail');
@@ -170,15 +165,13 @@ function moreDetailsUser(id) {
     // สร้างรายการยานพาหนะของ user คนนี้ (ถ้ามี)
     let vehiclesHTML = '';
     if (user.vehicles.length > 0) {
-        user.vehicles.forEach(v => {
+        user.vehicles.forEach((v, index) => {
             vehiclesHTML += `
-                <div class="headVlist">
+            <div class="headVlist">
                 <p class="Vlist">${v.plate}</p>
                 <p class="Vlist">${v.type}</p>
-                <a href="" data-target="velUser">แสดงข้อมูลเพิ่มเติม</a>
-                </div>`;
-            // TODO: "velUser" ยังไม่มีหน้ารองรับ (#page-velUser ไม่มีอยู่)
-            // และยังไม่มี event listener ผูกไว้ให้ลิงก์นี้ทำงาน -> รอทำฟีเจอร์ vehicle detail
+                <a href="" data-target="vehicleDetail" data-car-index="${index}" data-id="${user.id}">แสดงข้อมูลเพิ่มเติม</a>
+            </div>`;
         });
     } else {
         vehiclesHTML = `<div class="headVlist">
@@ -214,24 +207,12 @@ function moreDetailsUser(id) {
                 </section>`;
 }
 
-// ===================== Event delegation สำหรับลิงก์ในรายการ user =====================
-// ใช้วิธี delegate ที่ #UserData ตัวเดียว แทนการผูก event ให้ทุก <a> ที่สร้างขึ้นใหม่
-// เพราะ element พวกนี้ถูกสร้างใหม่ทุกครั้งที่ updateData() รันใหม่
-document.querySelector('#UserData').addEventListener('click', (e) => {
-    if (e.target.tagName === 'A') {
-        e.preventDefault();
-        const targetPage = e.target.dataset.target; // "userDetail"
-        if (targetPage) {
-            showPage(targetPage, Number(e.target.dataset.id));
-        }
-    }
-});
 
 // แสดงข้อมูลรถแต่ละคัน
 function vDetail(id, carIndex) {
     const user = mainData.find(u => u.id === id);
     const pVdetail = document.querySelector("#page-vehicleDetail");
-    if(!user){
+    if (!user) {
         pVdetail.innerHTML = `<p class="loading-text">ไม่พบข้อมูล</p>`;
         return;
     }
@@ -243,8 +224,8 @@ function vDetail(id, carIndex) {
 
     let timeIn = '';
     let timeOut = '';
-    if (data.timeInOut.length > 0){
-        data.timeInOut.forEach((t)=>{
+    if (data.timeInOut.length > 0) {
+        data.timeInOut.forEach((t) => {
             timeIn += `
             <span class="time-record">${t.in}</span>
             `
@@ -252,39 +233,54 @@ function vDetail(id, carIndex) {
             <span class="time-record">${t.out}</span>
             `
         });
-    }else{
+    } else {
         timeIn += `
             <span class="time-record">-</span>
             `
         timeOut += `
-            <span class="time-record">-</span>
-            `
+        <span class="time-record">-</span>
+        `
     }
     let page = `<div class="vehicle-card">
-                    <!-- head -->
-                    <div class="v-title">Vehicle information.</div>
-                    <div class="v-date">Register : ${data.dateMember} </div>
-            
-                    <!-- time -->
-                    <div class="v-grid">
-                        <div class="v-item">ป้ายทะเบียน : ${data.plate}</div>
-                        <div class="v-item">ประเภท : ${data.type}</div>
-                    
-                        <div class="v-item">เวลาเข้า</div>
-                        <div class="v-item">เวลาออก</div>
-                    
-                        <!-- Box สำหรับเวลาเข้า-->
-                        <div class="v-item v-time" id="time-in-list">
-                            ${timeIn}
-                        </div>
-                    
-                        <!-- Box สำหรับเวลาออก -->
-                        <div class="v-item v-time" id="time-out-list">
-                            ${timeOut}
-                        </div>
-                    </div>
-                </div>`;
-    pVdetail.innerHTML = page ;
+    <!-- head -->
+    <div class="v-title">Vehicle information.</div>
+    <div class="v-date">Register : ${data.regitter ?? '-'} </div>
+    
+    <!-- time -->
+    <div class="v-grid">
+    <div class="v-item">ป้ายทะเบียน : ${data.plate}</div>
+    <div class="v-item">ประเภท : ${data.type}</div>
+    
+    <div class="v-item">เวลาเข้า</div>
+    <div class="v-item">เวลาออก</div>
+    
+    <!-- Box สำหรับเวลาเข้า-->
+    <div class="v-item v-time" id="time-in-list">
+    ${timeIn}
+    </div>
+    
+    <!-- Box สำหรับเวลาออก -->
+    <div class="v-item v-time" id="time-out-list">
+    ${timeOut}
+    </div>
+    </div>
+    </div>`;
+    pVdetail.innerHTML = page;
 }
+
+// ===================== Event delegation สำหรับลิงก์ในรายการ user =====================
+// ใช้วิธี delegate ที่ #UserData ตัวเดียว แทนการผูก event ให้ทุก <a> ที่สร้างขึ้นใหม่
+// เพราะ element พวกนี้ถูกสร้างใหม่ทุกครั้งที่ updateData() รันใหม่
+document.querySelector('.main-content').addEventListener('click', (e) => {
+    const link = e.target.closest('a[data-target]');
+    if (!link) return;
+    e.preventDefault();
+
+    const { target, ...params } = link.dataset;
+
+    console.log(`target:${target}`);
+    console.log(`params:`, params);
+    showPage(target, params);
+});
 // เริ่มโหลดข้อมูลทันทีที่สคริปต์รัน
 load(url);
