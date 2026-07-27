@@ -12,7 +12,7 @@ body{
     margin: 0;
     padding: 0;
     background-color: var(--color-bg);
-    font-family: "Pridi", "Prompt", serif;
+    font-family: "Prompt", serif;
 }
 h1, h2, h3, h4, h5, h6, p {
     margin: 0;
@@ -117,7 +117,7 @@ header{
     .homeDetail{
         display: flex;
         flex-direction: column;
-        .homeNumber,.nameOwner{
+        .homeNumber,.nameOwner,.TimeData{
             display: flex;
             flex-direction: row;
             background-color: var(--color-primary);
@@ -170,3 +170,90 @@ header{
 }
 
 
+/* =========================================
+   UI สำหรับหน้า Vehicle Detail
+   ========================================= */
+
+#page-vehicleDetail {
+
+    background-color: var(--color-bg); 
+    padding: 30px 20px;
+    min-height: 100vh;
+}
+
+.vehicle-card {
+    max-width: 56.25rem; /* กำหนดขนาดความกว้างสูงสุดให้พอดี */
+    margin: 0 auto;   /* จัดให้อยู่กึ่งกลางหน้าจอ */
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* ระยะห่างระหว่างแถว */
+    font-family: sans-serif;
+}
+
+/* สไตล์กล่องสีน้ำเงินพื้นฐาน */
+.v-title, .v-date, .v-item {
+    background-color: var(--color-primary); /* สีน้ำเงินเข้มตามรูป */
+    color: var(--color-white);
+    text-align: center;
+    padding: 15px;
+    font-size: 1.2rem;
+}
+
+/* ปรับแต่งส่วน Header ให้ตัวใหญ่และหนาขึ้น */
+.v-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 20px;
+}
+
+.v-date {
+    font-size: 1.1rem;
+    padding: 10px;
+}
+
+/* ใช้ CSS Grid แบ่งข้อมูลเป็น 2 คอลัมน์ */
+.v-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* แบ่งครึ่ง 50/50 */
+    gap: 8px 15px; /* ระยะห่าง บน-ล่าง 8px, ซ้าย-ขวา 15px */
+}
+
+/* ปรับแต่งกล่องเวลาให้สูงและจัดข้อความไว้ด้านบน */
+.v-item.v-time {
+    min-height: 250px;
+    max-height: 350px; /* กำหนดความสูงสูงสุด (ถ้าข้อมูลเยอะกว่านี้จะเกิด Scroll) */
+    font-size: 1.5rem;
+    display: flex;
+    flex-direction: column; /* สั่งให้ข้อมูลเรียงจากบนลงล่าง */
+    justify-content: flex-start; /* ดันข้อมูลให้เริ่มจากขอบบน */
+    align-items: center;
+    padding-top: 15px; /* ลด padding-top ลงนิดหน่อยให้พอดีกับข้อมูล */
+    gap: 10px; /* ระยะห่างระหว่างรอบเวลา */
+    overflow-y: auto; /* เปิดใช้งาน Scrollbar แนวตั้งถ้าข้อมูลล้น */
+}
+
+/* --- เพิ่มตัวใหม่ --- */
+.time-record {
+    width: 80%; /* ความกว้างของเส้นคั่น */
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* เส้นคั่นสีขาวจางๆ */
+}
+
+/* เอาเส้นคั่นของรายการสุดท้ายออก จะได้ดูสวยงาม */
+.time-record:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* ตกแต่ง Scrollbar ให้เข้ากับโทนสี (ใช้ได้ใน Chrome, Safari, Edge) */
+.v-item.v-time::-webkit-scrollbar {
+    width: 6px;
+}
+.v-item.v-time::-webkit-scrollbar-track {
+    background: #002244; 
+    border-radius: 10px;
+}
+.v-item.v-time::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.5); 
+    border-radius: 10px;
+}
