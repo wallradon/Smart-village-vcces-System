@@ -116,12 +116,12 @@ function renderUserPage(target, params) {
     // 5. สถานะ "สำเร็จ" -> render เนื้อหาจริงตามหน้า
     if (target === "user") {
         console.log(`Open USER DATA`);
-        updateData(mainData);
+        renderUserList(mainData);
     } else if (target === "userDetail") {
         console.log(`Open moreDetailsUser`);
-        moreDetailsUser(Number(params.id));
+        renderUserDetail(Number(params.id));
     } else if (target === "vehicleDetail") {
-        vDetail(Number(params.id), Number(params.carIndex));
+        renderVehicleDetail(Number(params.id), Number(params.carIndex));
     } else if (target === "vehicle") {
         // ยังไม่ได้ทำ
     } else if (target === "home") {
@@ -135,29 +135,29 @@ function renderUserPage(target, params) {
  * สร้างรายการ user ทั้งหมดใส่ใน #UserData
  * (ตั้งค่า innerHTML ครั้งเดียวหลัง loop จบ เพื่อลด reflow/repaint)
  */
-function updateData(data) {
-    const UserData = document.querySelector('#UserData');
-    let div = "";
-    data.forEach(element => {
-        div += `
+function renderUserList(users) {
+    const userDataContainer = document.querySelector('#UserData');
+    let htmlContent = "";
+    users.forEach(user => {
+        htmlContent += `
         <div class="User">
-            <h2>${element.id}</h2>
-            <h2>${element.houseNumber}</h2>
-            <a href="#" data-id="${element.id}" data-target="userDetail" >แสดงข้อมูลเพิ่มเติม</a>
+            <h2>${user.id}</h2>
+            <h2>${user.houseNumber}</h2>
+            <a href="#" data-id="${user.id}" data-target="userDetail" >แสดงข้อมูลเพิ่มเติม</a>
         </div>
         `;
     });
-    UserData.innerHTML = div;
+    userDataContainer.innerHTML = htmlContent;
 }
 // ===================== Render หน้ารายละเอียด user =====================
 
-function moreDetailsUser(id) {
-    const user = mainData.find(u => u.id === id);
-    const moreUserde = document.querySelector('#page-userDetail');
+function renderUserDetail(userId) {
+    const user = mainData.find(u => u.id === userId);
+    const userDetailContainer = document.querySelector('#page-userDetail');
 
     // กันกรณีหา user ไม่เจอ (id ผิด หรือข้อมูลยังไม่มา) ไม่งั้นจะ error ตอนอ่าน user.vehicles
     if (!user) {
-        moreUserde.innerHTML = `<p class="loading-text">ไม่พบข้อมูล</p>`;
+        userDetailContainer.innerHTML = `<p class="loading-text">ไม่พบข้อมูล</p>`;
         return;
     }
     console.log(user);
@@ -165,11 +165,11 @@ function moreDetailsUser(id) {
     // สร้างรายการยานพาหนะของ user คนนี้ (ถ้ามี)
     let vehiclesHTML = '';
     if (user.vehicles.length > 0) {
-        user.vehicles.forEach((v, index) => {
+        user.vehicles.forEach((vehicle, index) => {
             vehiclesHTML += `
             <div class="headVlist">
-                <p class="Vlist">${v.plate}</p>
-                <p class="Vlist">${v.type}</p>
+                <p class="Vlist">${vehicle.plate}</p>
+                <p class="Vlist">${vehicle.type}</p>
                 <a href="" data-target="vehicleDetail" data-car-index="${index}" data-id="${user.id}">แสดงข้อมูลเพิ่มเติม</a>
             </div>`;
         });
@@ -181,7 +181,7 @@ function moreDetailsUser(id) {
                         </div>`;
     }
 
-    moreUserde.innerHTML = `
+    userDetailContainer.innerHTML = `
             <section class="homeDetail">
                 <div class="homeNumber">
                     <p class="homeList">เลขที่บ้าน</p>
@@ -209,63 +209,63 @@ function moreDetailsUser(id) {
 
 
 // แสดงข้อมูลรถแต่ละคัน
-function vDetail(id, carIndex) {
-    const user = mainData.find(u => u.id === id);
-    const pVdetail = document.querySelector("#page-vehicleDetail");
+function renderVehicleDetail(userId, vehicleIndex) {
+    const user = mainData.find(u => u.id === userId);
+    const vehicleDetailContainer = document.querySelector("#page-vehicleDetail");
     if (!user) {
-        pVdetail.innerHTML = `<p class="loading-text">ไม่พบข้อมูล</p>`;
+        vehicleDetailContainer.innerHTML = `<p class="loading-text">ไม่พบข้อมูล</p>`;
         return;
     }
-    const data = user.vehicles[carIndex];//เข้าถึงข้อมูลรถ
-    if (!data) {
-        pVdetail.innerHTML = `<p class="loading-text">ไม่พบข้อมูลยานพาหนะ</p>`;
+    const vehicleData = user.vehicles[vehicleIndex];//เข้าถึงข้อมูลรถ
+    if (!vehicleData) {
+        vehicleDetailContainer.innerHTML = `<p class="loading-text">ไม่พบข้อมูลยานพาหนะ</p>`;
         return;
     }
 
-    let timeIn = '';
-    let timeOut = '';
-    if (data.timeInOut.length > 0) {
-        data.timeInOut.forEach((t) => {
-            timeIn += `
-            <span class="time-record">${t.in}</span>
+    let timeInHTML = '';
+    let timeOutHTML = '';
+    if (vehicleData.timeInOut.length > 0) {
+        vehicleData.timeInOut.forEach((timeRecord) => {
+            timeInHTML += `
+            <span class="time-record">${timeRecord.in ?? '-'}</span>
             `
-            timeOut += `
-            <span class="time-record">${t.out}</span>
+            timeOutHTML += `
+            <span class="time-record">${timeRecord.out ?? '-'}</span>
             `
         });
     } else {
-        timeIn += `
+        timeInHTML += `
             <span class="time-record">-</span>
             `
-        timeOut += `
+        timeOutHTML += `
         <span class="time-record">-</span>
         `
     }
-    let page = `<div class="vehicle-card">
+    let htmlContent = `<div class="vehicle-card">
     <!-- head -->
     <div class="v-title">Vehicle information.</div>
-    <div class="v-date">Register : ${data.regitter ?? '-'} </div>
+    <div class="v-date">Register : ${vehicleData.regitter ?? '-'} </div>
     
     <!-- time -->
     <div class="v-grid">
-    <div class="v-item">ป้ายทะเบียน : ${data.plate}</div>
-    <div class="v-item">ประเภท : ${data.type}</div>
+    <div class="v-item">ป้ายทะเบียน : ${vehicleData.plate ?? '-'}</div>
+    <div class="v-item">ประเภท : ${vehicleData.type ?? '-'}</div>
     
     <div class="v-item">เวลาเข้า</div>
     <div class="v-item">เวลาออก</div>
     
     <!-- Box สำหรับเวลาเข้า-->
     <div class="v-item v-time" id="time-in-list">
-    ${timeIn}
+    ${timeInHTML}
     </div>
     
     <!-- Box สำหรับเวลาออก -->
     <div class="v-item v-time" id="time-out-list">
-    ${timeOut}
+    ${timeOutHTML}
     </div>
     </div>
     </div>`;
-    pVdetail.innerHTML = page;
+    vehicleDetailContainer.innerHTML = htmlContent;
 }
 
 // ===================== Event delegation สำหรับลิงก์ในรายการ user =====================

@@ -1,0 +1,40 @@
+รายละเอียดสำหรับออกแบบฐานข้อมูล (Database Requirements)
+โปรเจกต์: Smart-village-vcces-System
+หมายเหตุ: ไม่รวมข้อมูลของหน้า Home (รอสรุปจากอาจารย์)
+
+จากข้อมูลและโครงสร้างของระบบในปัจจุบัน (อ้างอิงจาก dataTest.json และหน้า User/Vehicle) ระบบต้องการฐานข้อมูลที่มีความสัมพันธ์กัน 3 ส่วนหลัก ๆ ดังนี้:
+
+---
+
+1. Table: Users หรือ Residents (ตารางเก็บข้อมูลลูกบ้าน)
+เป็นตารางสำหรับเก็บข้อมูลหลักของลูกบ้านแต่ละหลัง
+- id (Primary Key, Integer, Auto Increment) : รหัสอ้างอิงลูกบ้าน
+- houseNumber (String/Varchar) : เลขที่บ้าน
+- ownerName (String/Varchar) : ชื่อ-นามสกุลเจ้าของบ้าน/หัวหน้าครอบครัว
+- registerDate (Date/DateTime) : วันที่ลงทะเบียนข้อมูลเข้าสู่ระบบ
+- memberStartDate (Date/DateTime) : วันที่เริ่มต้นการเป็นสมาชิก
+- memberExpireDate (Date/DateTime) : วันที่หมดอายุการเป็นสมาชิก
+
+---
+
+2. Table: Vehicles (ตารางเก็บข้อมูลยานพาหนะ)
+เป็นตารางสำหรับเก็บข้อมูลรถของลูกบ้านแต่ละหลัง (ความสัมพันธ์แบบ 1 ลูกบ้าน มีได้หลายยานพาหนะ / 1 to Many)
+- id (Primary Key, Integer, Auto Increment) : รหัสอ้างอิงยานพาหนะ
+- user_id (Foreign Key, Integer) : รหัสอ้างอิงลูกบ้าน (เชื่อมกับ id ของตาราง Users)
+- plate (String/Varchar) : ป้ายทะเบียนรถ
+- type (String/Varchar) : ประเภทของรถ (เช่น Car, Motorcycle)
+- registerDate (Date/DateTime) : วันที่ลงทะเบียนรถเข้าสู่ระบบ
+
+---
+
+3. Table: Vehicle_Logs (ตารางเก็บประวัติการเข้า-ออกของรถ)
+เป็นตารางสำหรับบันทึกเวลาที่รถแต่ละคันผ่านเข้า-ออกหมู่บ้าน (ความสัมพันธ์แบบ 1 ยานพาหนะ มีได้หลายประวัติ / 1 to Many)
+- id (Primary Key, Integer, Auto Increment) : รหัสอ้างอิงบันทึกการเข้า-ออก
+- vehicle_id (Foreign Key, Integer) : รหัสอ้างอิงยานพาหนะ (เชื่อมกับ id ของตาราง Vehicles)
+- time_in (DateTime) : วันและเวลาที่ขับรถเข้าหมู่บ้าน
+- time_out (DateTime/Null) : วันและเวลาที่ขับรถออกจากหมู่บ้าน (อาจเป็น Null ได้ถ้ายังไม่ออก)
+
+---
+สรุปความสัมพันธ์ (Relationship):
+- Users (1) -> (M) Vehicles
+- Vehicles (1) -> (M) Vehicle_Logs
