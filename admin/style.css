@@ -36,6 +36,24 @@ header{
         position: relative;
         width: 4.375rem;
     } 
+    .logout-btn-header {
+        background-color: transparent;
+        color: var(--color-white);
+        border: 1.5px solid rgba(255, 255, 255, 0.5);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-family: "Prompt", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+    .logout-btn-header:hover {
+        background-color: #e74c3c;
+        border-color: #e74c3c;
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
 }
 
 .head-content{

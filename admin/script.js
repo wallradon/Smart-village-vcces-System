@@ -1,5 +1,11 @@
 "use strict"
 
+// 0. ตรวจสอบสิทธิ์การเข้าถึง (Authentication Guard / Route Protection)
+if (sessionStorage.getItem("isLoggedIn") !== "true") {
+    // หากไม่มีบัตรผ่าน ให้เด้งกลับไปหน้า Login ทันที
+    window.location.href = "../login/login.html";
+}
+
 // ===================== ตัวแปรสถานะหลักของแอป =====================
 const url = "./dataTest.json";
 let mainData = [];       // ข้อมูลลูกบ้านทั้งหมดที่โหลดมาจาก JSON
@@ -33,6 +39,18 @@ navItems.forEach(li => {
         showPage(li.dataset.target);
     });
 });
+
+// ===================== ระบบออกจากระบบ (Logout System) =====================
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        // ลบข้อมูลเซสชัน (Clear Session)
+        sessionStorage.removeItem("isLoggedIn");
+        // ดีดกลับหน้าหลัก (Landing Page)
+        window.location.href = "../index.html";
+    });
+}
 
 // เปิดหน้า home เป็นค่าเริ่มต้นตอนโหลดสคริปต์
 showPage('home');

@@ -1,0 +1,38 @@
+/* ตกแต่งส่วนเนื้อหาตรงกลางของหน้าแรกเพิ่มเติม */
+.landing-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 80px); /* หักความสูงของ header ออก */
+    text-align: center;
+    background-color: var(--color-bg);
+}
+.landing-title {
+    font-size: 3.5rem;
+    color: var(--color-primary);
+    margin-bottom: 20px;
+}
+.landing-subtitle {
+    font-size: 1.5rem;
+    color: var(--color-secondary);
+}
+/* ปุ่มเข้าสู่ระบบมุมขวาบน แบบไม่มีเส้นใต้ (ใช้เป็นแท็ก <a> เพื่อให้เปลี่ยนหน้าได้ทันที) */
+.login-btn-header {
+    background-color: transparent;
+    color: var(--color-white);
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-family: "Prompt", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none; /* เอาขีดเส้นใต้ออก */
+    outline: none;
+}
+.login-btn-header:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* เรืองแสงเป็นสีขาวจางๆ ให้ดูหรูหรา */
+    border-color: var(--color-white);
+}

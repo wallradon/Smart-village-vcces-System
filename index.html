@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Village - VCCES</title>
+    <!-- เรียกใช้ CSS ของธีม Admin มาเป็นฐาน -->
+    <link rel="stylesheet" href="admin/style.css">
+    <!-- ไฟล์ CSS สำหรับปรับแต่งหน้าแรก (เพิ่มเติมจาก ธีม Admin) -->
+    <link rel="stylesheet" href="indexStyle.css">
+</head>
+<body>
+    <header>
+        <img src="admin/placeholder-300x300.png" alt="Logo">
+        <h1 class="head-content">ระบบจัดการข้อมูลลูกบ้าน</h1>
+        
+        <!-- ปุ่มเข้าสู่ระบบเชื่อมไปยังหน้า login.html -->
+        <a href="login/login.html" class="login-btn-header">เข้าสู่ระบบ (Login)</a>
+    </header>
+
+    <main class="landing-main">
+        <h2 class="landing-title">ยินดีต้อนรับสู่ Smart Village</h2>
+        <p class="landing-subtitle">ระบบจัดการหมู่บ้านอัจฉริยะ VCCES</p>
+    </main>
+
+    <!-- Smart Router: ถ้าตรวจพบว่าเคยล็อกอินไว้แล้ว จะดีดไปหน้า Admin ให้อัตโนมัติ -->
+    <script>
+        if (sessionStorage.getItem("isLoggedIn") === "true") {
+            window.location.href = "admin/admin.html";
+        }
+    </script>
+</body>
+</html>

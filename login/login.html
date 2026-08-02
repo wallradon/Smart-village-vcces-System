@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Smart Village</title>
+    <!-- ฟอนต์และ CSS ประจำโครงการ -->
+    <link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+
+    <!-- กล่องสำหรับกรอกข้อมูล (Login Container) -->
+    <div class="login-container">
+        <h2>เข้าสู่ระบบ (Login)</h2>
+
+        <form id="loginForm">
+            <!-- ช่องกรอกชื่อผู้ใช้ (Username) -->
+            <div class="form-group">
+                <label for="username">ชื่อผู้ใช้:</label>
+                <input type="text" id="username" placeholder="กรอกชื่อผู้ใช้" required>
+            </div>
+
+            <!-- ช่องกรอกรหัสผ่าน (Password) -->
+            <div class="form-group">
+                <label for="password">รหัสผ่าน:</label>
+                <input type="password" id="password" placeholder="กรอกรหัสผ่าน" required>
+            </div>
+
+            <!-- ปุ่มกด (Submit Button) -->
+            <button type="submit">เข้าสู่ระบบ</button>
+        </form>
+
+        <!-- ข้อความแจ้งเตือนเวลาเข้าสู่ระบบผิด -->
+        <p id="errorMessage" style="display: none;">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง!</p>
+    </div>
+
+    <!-- เชื่อมต่อไฟล์สคริปต์ JavaScript -->
+    <script src="login.js"></script>
+</body>
+
+</html>
