@@ -174,8 +174,8 @@ function renderVehicleList(users) {
 
                         htmlContent += `
                         <div class="User VehicleRow">
-                            <h2>${plate}</h2>
                             <h2>${type}</h2>
+                            <h2>${plate}</h2>
                             <h2>${recordText}</h2>
                         </div>
                         `;
@@ -185,8 +185,8 @@ function renderVehicleList(users) {
                     foundCount++;
                     htmlContent += `
                     <div class="User VehicleRow">
-                        <h2>${plate}</h2>
                         <h2>${type}</h2>
+                        <h2>${plate}</h2>
                         <h2>ยังไม่มีประวัติเข้า-ออก</h2>
                     </div>
                     `;

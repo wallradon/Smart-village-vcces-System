@@ -121,7 +121,10 @@ header{
             }
         }
         .VehicleRow, .headVehicleData {
-            grid-template-columns: 10rem 10rem 1fr !important;
+            grid-template-columns: 10rem 1fr 1fr !important;
+            h2:nth-child(2) {
+                text-align: center;
+            }
             h2:last-child {
                 text-align: right;
             }
