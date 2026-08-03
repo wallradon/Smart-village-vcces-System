@@ -499,21 +499,70 @@ tbody td code {
     font-size: 0.85rem;
 }
 
-/* ===================== Responsive ===================== */
-@media (max-width: 640px) {
+/* ===================== Responsive Design ===================== */
+@media (max-width: 768px) {
     main {
-        padding: 28px 16px 40px;
-    }
-    .section-title {
-        font-size: 1.25rem;
-    }
-    .part-label {
-        font-size: 1.35rem;
+        padding: 30px 16px 50px;
     }
     .hero {
-        padding: 56px 16px 48px;
+        padding: 60px 16px 44px;
+    }
+    .hero-badge {
+        font-size: 0.75rem;
+        padding: 4px 12px;
+    }
+    .section-title {
+        font-size: 1.3rem;
+    }
+    .part-label {
+        font-size: 1.45rem;
+    }
+    .sub-title {
+        font-size: 1.05rem;
+        margin: 24px 0 12px;
+    }
+    .toc-grid, .compare, .check-grid {
+        grid-template-columns: 1fr;
+    }
+    .demo-wrap {
+        max-width: 100%;
+        padding: 20px;
+    }
+    .code-head {
+        font-size: 0.78rem;
+        padding: 10px 14px;
+    }
+    .code-card pre {
+        padding: 14px;
+    }
+    .code-card code {
+        font-size: 0.76rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 1.7rem;
+    }
+    .hero-sub {
+        font-size: 0.9rem;
+    }
+    .hero-tags span {
+        font-size: 0.72rem;
+        padding: 3px 10px;
+    }
+    .flow {
+        flex-direction: column;
+    }
+    .flow-step {
+        width: 100%;
     }
     .flow-arrow {
         transform: rotate(90deg);
+        margin: 4px 0;
+    }
+    thead th, tbody td {
+        padding: 10px 12px;
+        font-size: 0.82rem;
     }
 }
