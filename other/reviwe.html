@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Review - Smart Village VCCES System</title>
+    <link rel="stylesheet" href="reviweStyle.css">
+</head>
+<body>
+
+    <header class="hero">
+        <div class="hero-inner">
+            <span class="hero-badge">IOT · RMUTL ENGCP_3</span>
+            <h1>Smart Village VCCES System</h1>
+            <p class="hero-sub">รีวิวภาพรวมโปรเจกต์ ระบบบริหารจัดการการเข้า-ออกของยานพาหนะภายในหมู่บ้านอัจฉริยะ</p>
+            <div class="hero-tags">
+                <span>HTML</span>
+                <span>CSS</span>
+                <span>JavaScript</span>
+                <span>JSON</span>
+                <span>Session Storage</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- ============ ภาพรวม ============ -->
+        <section class="section" id="overview">
+            <h2 class="section-title"><span>1</span> วัตถุประสงค์ของระบบ (Goal)</h2>
+            <div class="goal-card">
+                <p>
+                    <strong>Smart Village VCCES System</strong> คือระบบบริหารจัดการการเข้า-ออกของยานพาหนะ
+                    ภายในหมู่บ้านอัจฉริยะ ช่วยให้ผู้ดูแลระบบ (Admin) ตรวจสอบประวัติรถเข้า-ออก บันทึกเวลา
+                    และดูแลความปลอดภัยของลูกบ้านได้อย่างมีประสิทธิภาพ ผ่านหน้าเว็บ (Web Application)
+                </p>
+            </div>
+
+            <h2 class="section-title"><span>2</span> โครงสร้างระบบ (System Architecture)</h2>
+            <div class="arch">
+                <div class="arch-col">
+                    <div class="arch-box module-login">
+                        <div class="arch-head">login/ <em>🔐 Authentication</em></div>
+                        <ul>
+                            <li><code>login.html</code> — ฟอร์มกรอกชื่อผู้ใช้/รหัสผ่าน</li>
+                            <li><code>login.css</code> — ตกแต่งตาม Design System</li>
+                            <li><code>login.js</code> — ตรวจสอบสิทธิ์ + ออกบัตรผ่าน</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="arch-col">
+                    <div class="arch-box module-admin">
+                        <div class="arch-head">admin/ <em>🛡️ Dashboard</em></div>
+                        <ul>
+                            <li><code>admin.html</code> — หน้าหลักแสดงลูกบ้าน/ยานพาหนะ</li>
+                            <li><code>style.css</code> — UI / Grid &amp; Flexbox</li>
+                            <li><code>script.js</code> — ดึงข้อมูล + render รายการ + ประวัติเวลา</li>
+                            <li><code>dataTest.json</code> — ข้อมูลจำลอง (Mock Data)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="arch-col">
+                    <div class="arch-box module-root">
+                        <div class="arch-head">root/ <em>🏠 Landing</em></div>
+                        <ul>
+                            <li><code>index.html</code> — หน้าต้อนรับ (Smart Router)</li>
+                            <li><code>indexStyle.css</code> — สไตล์เฉพาะหน้าแรก</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ เทคโนโลยี ============ -->
+        <section class="section" id="stack">
+            <h2 class="section-title"><span>3</span> เทคโนโลยีที่ใช้ (Tech Stack)</h2>
+            <div class="stack-grid">
+                <div class="stack-card">
+                    <div class="stack-icon html">HTML</div>
+                    <h3>โครงสร้างหน้าเว็บ</h3>
+                    <p>Landing Page, Login Form และ Admin Dashboard</p>
+                </div>
+                <div class="stack-card">
+                    <div class="stack-icon css">CSS</div>
+                    <h3>ตกแต่ง Modern UI</h3>
+                    <p>CSS Variables, Grid &amp; Flexbox, Responsive</p>
+                </div>
+                <div class="stack-card">
+                    <div class="stack-icon js">JS</div>
+                    <h3>การทำงานระบบ</h3>
+                    <p>DOM, Event Listener, fetch(), Session Storage</p>
+                </div>
+                <div class="stack-card">
+                    <div class="stack-icon json">{ }</div>
+                    <h3>ข้อมูลจำลอง</h3>
+                    <p>Mock Data ใช้ <code>fetch()</code> โหลด JSON แบบ Async</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ ฟีเจอร์หลัก ============ -->
+        <section class="section" id="features">
+            <h2 class="section-title"><span>4</span> ฟีเจอร์หลักของระบบ (Key Features)</h2>
+            <div class="feat-grid">
+                <div class="feat-card">
+                    <div class="feat-num">01</div>
+                    <h3>Authentication</h3>
+                    <p>ตรวจสอบ Username &amp; Password เทียบกับ Mock Data ก่อนเข้าใช้งาน</p>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-num">02</div>
+                    <h3>Route Protection</h3>
+                    <p>Guard หน้า Admin ด้วย Session Storage — ยังไม่ล็อกอินจะเด้งกลับหน้า Login</p>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-num">03</div>
+                    <h3>Async Data Loading</h3>
+                    <p><code>fetch()</code> + สถานะ loading / error เพื่อแสดงผลแบบไดนามิก</p>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-num">04</div>
+                    <h3>Vehicle Timeline</h3>
+                    <p>แสดงประวัติเวลาเข้า-ออกของรถแต่ละคัน พร้อม Fallback <code>?? '-'</code></p>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-num">05</div>
+                    <h3>Event Delegation</h3>
+                    <p>จัดการคลิกของลิงก์ที่สร้างใหม่บน Container เดียว ลดการผูก Event ซ้ำซ้อน</p>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-num">06</div>
+                    <h3>Logout System</h3>
+                    <p>ล้าง Session และดีดกลับไปหน้า Landing เพื่อความปลอดภัย</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ คำศัพท์เทคนิค ============ -->
+        <section class="section" id="terms">
+            <h2 class="section-title"><span>5</span> คำศัพท์เทคนิคประจำโปรเจกต์</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Term</th>
+                            <th>คำแปล/ความหมาย</th>
+                            <th>การนำไปใช้ในโปรเจกต์</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Authentication</code></td>
+                            <td>การตรวจสอบสิทธิ์ / ยืนยันตัวตน</td>
+                            <td>การเช็ก Username &amp; Password ในหน้า Login</td>
+                        </tr>
+                        <tr>
+                            <td><code>DOM</code></td>
+                            <td>โครงสร้างวัตถุของหน้าเว็บ</td>
+                            <td>การใช้ JS จับ element เช่น <code>document.getElementById()</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>Event Listener</code></td>
+                            <td>ตัวดักฟังเหตุการณ์</td>
+                            <td><code>addEventListener('submit')</code> ตอนกดปุ่ม Login</td>
+                        </tr>
+                        <tr>
+                            <td><code>Mock Data</code></td>
+                            <td>ข้อมูลจำลอง</td>
+                            <td>ข้อมูลสมมติใน <code>dataTest.json</code> และตัวแปรใน <code>login.js</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>Fallback Value</code></td>
+                            <td>ค่าสำรองเมื่อไม่มีข้อมูล</td>
+                            <td>การใช้ <code>?? '-'</code> ป้องกันหน้าเว็บแสดงค่า <code>null</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>Session Storage</code></td>
+                            <td>พื้นที่เก็บข้อมูลชั่วคราวของแท็บ</td>
+                            <td>เก็บ <code>isLoggedIn</code> เป็นบัตรผ่านเข้าสู่ระบบ</td>
+                        </tr>
+                        <tr>
+                            <td><code>Responsive Design</code></td>
+                            <td>ออกแบบรองรับทุกอุปกรณ์</td>
+                            <td>การใช้ CSS Grid / Flexbox จัดเลย์เอาต์หน้าจอ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ============ Q&A ============ -->
+        <section class="section" id="qa">
+            <h2 class="section-title"><span>6</span> แนวคำถาม-ตอบ สำหรับนำเสนอ</h2>
+
+            <details class="qa-item" open>
+                <summary>Q1: โปรเจกต์นี้ทำงานอย่างไร?</summary>
+                <div class="qa-body">
+                    <p><strong>ตอบแบบ ELI5:</strong> ระบบนี้ทำงานเหมือน <em>"ป้อมยามอัจฉริยะ"</em> มี 2 ส่วนหลัก</p>
+                    <ol>
+                        <li><strong>ส่วน Login (login/)</strong> — เหมือนประตูตรวจสอบสิทธิ์ ยามเช็กว่าชื่อผู้ใช้และรหัสผ่านถูกต้องไหม ถ้าถูกจะให้ "บัตรผ่าน" เข้าสู่ระบบ</li>
+                        <li><strong>ส่วน Admin Dashboard (admin/)</strong> — เหมือนห้องควบคุมหลัก แสดงสมุดลงทะเบียนรายชื่อบ้าน ทะเบียนรถ และเวลาเข้า-ออกย้อนหลัง โดยใช้ JavaScript ดึงข้อมูลจากไฟล์ JSON มาแสดงผลแบบไดนามิก</li>
+                    </ol>
+                </div>
+            </details>
+
+            <details class="qa-item">
+                <summary>Q2: ในหน้า Login มีการทำงานของ JavaScript อย่างไร?</summary>
+                <div class="qa-body">
+                    <p><strong>ตอบแบบสรุปเทคนิค:</strong> เราใช้แนวคิด <strong>DOM Selection</strong> และ <strong>Event Listener</strong></p>
+                    <ul>
+                        <li>เมื่อผู้ใช้กดปุ่ม Submit ใช้ <code>event.preventDefault()</code> เพื่อไม่ให้หน้าเว็บ Refresh</li>
+                        <li>นำค่าจากช่อง <code>username</code> และ <code>password</code> มาเช็กกับข้อมูล Mock Data</li>
+                        <li>ถ้าถูกต้อง สั่งเปลี่ยนหน้าด้วย <code>window.location.href = '../admin/admin.html'</code></li>
+                        <li>ถ้าผิด สั่งให้ Element แจ้งเตือนเปลี่ยนสถานะเป็น <code>display: block</code></li>
+                    </ul>
+                </div>
+            </details>
+
+            <details class="qa-item">
+                <summary>Q3: ทำไมต้องใช้ <code>?? '-'</code> (Nullish Coalescing)?</summary>
+                <div class="qa-body">
+                    <p><strong>ตอบแบบสรุปเทคนิค:</strong> ใช้เป็น <strong>Fallback Value</strong> (ค่าสำรอง) ในกรณีที่ข้อมูลจากไฟล์ JSON ส่งค่ามาเป็น <code>null</code> หรือ <code>undefined</code> (เช่น รถบางคันยังไม่มีประวัติเวลาออก) ตัว <code>??</code> จะช่วยนำข้อความ fallback คือ <code>'-'</code> มาแสดงแทน เพื่อไม่ให้หน้าเว็บขึ้นคำว่า <code>null</code> หรือเกิดข้อผิดพลาด</p>
+                </div>
+            </details>
+
+            <details class="qa-item">
+                <summary>Q4: โปรเจกต์นี้เชื่อมโยงกับ IoT อย่างไรในอนาคต?</summary>
+                <div class="qa-body">
+                    <p><strong>ตอบแบบภาพรวม IoT:</strong> ระบบนี้สามารถนำไปเชื่อมต่อกับอุปกรณ์ <strong>IoT Hardware</strong> ได้ เช่น</p>
+                    <ul>
+                        <li><strong>กล้องอ่านทะเบียนรถ (ALPR Camera / ESP32-CAM):</strong> เมื่อรถขับผ่านป้อมยาม กล้องจะส่งเลขทะเบียนผ่าน <strong>API/MQTT</strong> เข้ามายังระบบหลังบ้าน</li>
+                        <li><strong>ไม้กั้นอัตโนมัติ (Servo / Relay):</strong> ถ้าเช็กแล้วเป็นรถลูกบ้านในระบบ จะส่งสัญญาณสั่งเปิดไม้กั้นอัตโนมัติ พร้อมบันทึกเวลาเข้า (<code>timeIn</code>) ลงฐานข้อมูล</li>
+                    </ul>
+                </div>
+            </details>
+        </section>
+
+        <!-- ============ โค้ดตัวอย่าง ============ -->
+        <section class="section" id="code">
+            <h2 class="section-title"><span>7</span> โค้ดตัวอย่าง (Code Highlights)</h2>
+            <div class="code-grid">
+                <div class="code-card">
+                    <div class="code-head">login.js — การตรวจสอบสิทธิ์</div>
+<pre><code><span class="c">// ตรวจสอบสิทธิ์ (Authentication Check)</span>
+loginForm.addEventListener(<span class="s">"submit"</span>, <span class="f">function</span> (event) {
+    <span class="c">// ป้องกันการ Refresh หน้าเว็บ</span>
+    event.preventDefault();
+
+    <span class="k">if</span> (inputUsername === MOCK_USER.username
+        &amp;&amp; inputPassword === MOCK_USER.password) {
+        <span class="c">// ออกบัตรผ่านและพาไปหน้า Admin</span>
+        sessionStorage.setItem(<span class="s">"isLoggedIn"</span>, <span class="s">"true"</span>);
+        window.location.href = <span class="s">"../admin/admin.html"</span>;
+    } <span class="k">else</span> {
+        errorMessage.style.display = <span class="s">"block"</span>;
+    }
+});</code></pre>
+                </div>
+
+                <div class="code-card">
+                    <div class="code-head">script.js — Fallback ด้วย ??</div>
+<pre><code><span class="c">// ถ้าไม่มีข้อมูลให้แสดง '-' แทน null</span>
+vehicleData.timeInOut.forEach((timeRecord) =&gt; {
+    timeInHTML += `
+    &lt;span class=<span class="s">"time-record"</span>&gt;
+        ${timeRecord.in ?? <span class="s">'-'</span>}
+    &lt;/span&gt;`;
+    timeOutHTML += `
+    &lt;span class=<span class="s">"time-record"</span>&gt;
+        ${timeRecord.out ?? <span class="s">'-'</span>}
+    &lt;/span&gt;`;
+});</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ อนาคต IoT ============ -->
+        <section class="section" id="roadmap">
+            <h2 class="section-title"><span>8</span> Roadmap สู่ IoT จริง</h2>
+            <div class="timeline">
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <h3>ปัจจุบัน — Frontend Demo</h3>
+                    <p>หน้าเว็บ + Mock Data + Auth Logic พร้อมทดสอบการใช้งาน</p>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <h3>ขั้นที่ 2 — เชื่อม API/ฐานข้อมูล</h3>
+                    <p>แทนที่ JSON ด้วย Backend API และ Database จริง (เช่น Node.js + MySQL)</p>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <h3>ขั้นที่ 3 — เชื่อม IoT Hardware</h3>
+                    <p>ESP32-CAM / ALPR ส่งเลขทะเบียนผ่าน MQTT, Servo/Relay ควบคุมไม้กั้น</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>Project Review — Smart Village VCCES System · IOT · RMUTL ENGCP_3</p>
+    </footer>
+
+</body>
+</html>

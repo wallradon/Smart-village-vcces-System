@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study - Mock Data → API &amp; Professional Login (Frontend)</title>
+    <link rel="stylesheet" href="study.css">
+</head>
+<body>
+
+    <header class="hero">
+        <div class="hero-inner">
+            <span class="hero-badge">STUDY GUIDE · FRONTEND ONLY · IOT · RMUTL ENGCP_3</span>
+            <h1>อัปเกรดโปรเจกต์ฝั่ง Frontend</h1>
+            <p class="hero-sub">เรียนเฉพาะฝั่งหน้าจอ (Frontend): จัดการข้อมูลแบบ API-ready และสร้างระบบ Login ให้ดูมืออาชีพ โดยไม่ต้องเขียน Backend เลย</p>
+            <div class="hero-tags">
+                <span>fetch()</span>
+                <span>async/await</span>
+                <span>Promise</span>
+                <span>Form Validation</span>
+                <span>Session Storage</span>
+                <span>Route Guard</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- ==================== สารบัญ ==================== -->
+        <section class="section">
+            <h2 class="section-title"><span>0</span> สารบัญ</h2>
+            <div class="toc-grid">
+                <a href="#part1" class="toc-card">
+                    <span class="toc-num">PART 1</span>
+                    <h3>Mock Data → API (Frontend)</h3>
+                    <p>แยก Data Layer · จัดการ loading/error/success · fetch จริงหรือจำลอง</p>
+                </a>
+                <a href="#part2" class="toc-card">
+                    <span class="toc-num">PART 2</span>
+                    <h3>Login แบบ Professional (Frontend)</h3>
+                    <p>Validation · UI States · Session · Route Guard · Demo ลองกดได้จริง</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- ==================== PART 1 ==================== -->
+        <section class="section" id="part1">
+            <h2 class="section-title part-label"><span>1</span> PART 1: จาก Mock Data → API (ฝั่ง Frontend)</h2>
+
+            <h3 class="sub-title">1.1 มุมมองของ Frontend</h3>
+            <div class="tip">
+                <strong>💡 หลักคิดสำคัญ:</strong> ฝั่ง Frontend ไม่ต้องรู้ว่าข้อมูลมาจากไฟล์ JSON ในเครื่อง หรือจาก Server ที่อยู่ไกล
+                หน้าที่ของเราคือ <strong>"ส่งคำขอ (Request) แล้วรอผลตอบกลับ (Response) มาแสดงผล"</strong>
+                การเขียนให้เป็นระเบียบจะทำให้ทีหลังเปลี่ยนแหล่งข้อมูลได้โดยไม่ต้องแก้หน้า HTML เลย
+            </div>
+
+            <h3 class="sub-title">1.2 ขั้นตอนที่ 1 — แยก Data Layer ออกเป็นไฟล์ <code>api.js</code></h3>
+            <div class="code-card">
+                <div class="code-head">admin/api.js — สร้างไฟล์ใหม่ไว้จัดการข้อมูลทั้งหมด (Separation of Concerns)</div>
+<pre><code><span class="c">// ไฟล์นี้มีหน้าที่เดียว: รับส่งข้อมูลกับแหล่งข้อมูล (Data Layer)</span>
+<span class="c">// โค้ดหน้า UI จะเรียกใช้แค่ฟังก์ชันพวกนี้ ไม่ต้องรู้ที่มาของข้อมูล</span>
+
+<span class="f">const</span> API = {
+
+    <span class="c">// เรียกข้อมูลลูกบ้านทั้งหมด</span>
+    <span class="f">async</span> getUsers() {
+        <span class="f">const</span> res = <span class="f">await</span> fetch(<span class="s">"./dataTest.json"</span>);
+        <span class="k">if</span> (!res.ok) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">`HTTP error: ${res.status}`</span>);
+        <span class="f">return</span> res.json();
+    },
+
+    <span class="c">// เรียกข้อมูลลูกบ้านคนเดียว</span>
+    <span class="f">async</span> getUser(id) {
+        <span class="f">const</span> res = <span class="f">await</span> fetch(<span class="s">`./dataTest.json`</span>);
+        <span class="k">if</span> (!res.ok) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">`HTTP error: ${res.status}`</span>);
+        <span class="f">const</span> users = <span class="f">await</span> res.json();
+        <span class="f">return</span> users.find(u =&gt; u.id === <span class="f">Number</span>(id));
+    }
+};</code></pre>
+            </div>
+            <div class="tip">
+                <strong>💡 ประโยชน์:</strong> ต่อไปถ้ามี Server จริง แค่เปลี่ยนบรรทัด URL ในไฟล์ <code>api.js</code> ที่เดียว
+                ส่วน <code>script.js</code> (การแสดงผล) ไม่ต้องแตะเลย
+            </div>
+
+            <h3 class="sub-title">1.3 ขั้นตอนที่ 2 — จำลอง API ด้วย Promise (เมื่อยังไม่มี Server)</h3>
+            <div class="code-card">
+                <div class="code-head">admin/api.js — จำลองความล่าช้าของเครือข่าย (ดูเหมือน API จริง)</div>
+<pre><code><span class="f">const</span> API = {
+
+    <span class="f">async</span> getUsers() {
+        <span class="c">// จำลองว่า Server ใช้เวลาตอบ 1.5 วิ (ตอน dev จะได้เห็น loading state)</span>
+        <span class="f">await new</span> <span class="f">Promise</span>(resolve =&gt; setTimeout(resolve, <span class="n">1500</span>));
+        <span class="f">const</span> res = <span class="f">await</span> fetch(<span class="s">"./dataTest.json"</span>);
+        <span class="k">if</span> (!res.ok) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">`HTTP error: ${res.status}`</span>);
+        <span class="f">return</span> res.json();
+    },
+
+    <span class="c">// จำลอง error (เพื่อทดสอบหน้าแสดงข้อผิดพลาด)</span>
+    <span class="f">async</span> getUsersFail() {
+        <span class="f">await new</span> <span class="f">Promise</span>(resolve =&gt; setTimeout(resolve, <span class="n">1500</span>));
+        <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">"Network error"</span>);   <span class="c">// ปล่อยให้ฝั่ง caller จัดการ</span>
+    }
+};</code></pre>
+            </div>
+
+            <h3 class="sub-title">1.4 ขั้นตอนที่ 3 — ใช้ Async/Await + try/catch ในหน้าแสดงผล</h3>
+            <div class="code-card">
+                <div class="code-head">admin/script.js — ดึงข้อมูลผ่าน Data Layer (โค้ดสะอาดกว่าเดิม)</div>
+<pre><code><span class="f">async function</span> <span class="f">load</span>() {
+    setLoading();   <span class="c">// 1. แสดงสถานะ "กำลังโหลด"</span>
+    <span class="k">try</span> {
+        mainData = <span class="f">await</span> API.getUsers();   <span class="c">// 2. ขอข้อมูล</span>
+        renderUserList(mainData);            <span class="c">// 3. วาดข้อมูลลงหน้า</span>
+    } <span class="k">catch</span> (err) {
+        showError(err.message);              <span class="c">// 4. มีปัญหา → แสดง error</span>
+    }
+}</code></pre>
+            </div>
+
+            <h3 class="sub-title">1.5 ขั้นตอนที่ 4 — จัดการ 3 สถานะ: Loading / Error / Success</h3>
+            <div class="flow">
+                <div class="flow-step"><strong>Loading</strong><br>แสดงข้อความ/ตัวหมุน (spinner) ขณะรอ</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step"><strong>Error</strong><br>แสดงข้อความแจ้ง + เปิดปุ่มลองใหม่</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step"><strong>Success</strong><br>วาดข้อมูลจริงบนหน้า</div>
+            </div>
+            <div class="code-card">
+                <div class="code-head">admin/script.js — ฟังก์ชันจัดการสถานะ</div>
+<pre><code><span class="f">function</span> setLoading() {
+    UserData.innerHTML = <span class="s">`&lt;p class="loading-text"&gt;⏳ Loading data...&lt;/p&gt;`</span>;
+}
+
+<span class="f">function</span> showError(msg) {
+    UserData.innerHTML = <span class="s">`&lt;p class="loading-text" style="color:red"&gt;
+        ❌ ${msg} — &lt;button onclick="load()"&gt;ลองใหม่&lt;/button&gt;&lt;/p&gt;`</span>;
+}</code></pre>
+            </div>
+
+            <h3 class="sub-title">1.6 เทคนิคขั้นสูง — ยกเลิก request ที่ไม่ต้องการ (AbortController)</h3>
+            <div class="code-card">
+                <div class="code-head">admin/api.js — ยกเลิก fetch ถ้าผู้ใช้เปลี่ยนหน้าเร็วเกินไป</div>
+<pre><code><span class="f">let</span> currentAbort = <span class="k">null</span>;
+
+<span class="f">async</span> getUsers() {
+    <span class="c">// ยกเลิก request ก่อนหน้า (ถ้ายังไม่เสร็จ) กันข้อมูลมาซ้อนกัน</span>
+    <span class="k">if</span> (currentAbort) currentAbort.abort();
+    currentAbort = <span class="k">new</span> <span class="f">AbortController</span>();
+
+    <span class="f">const</span> res = <span class="f">await</span> fetch(<span class="s">"./dataTest.json"</span>, { signal: currentAbort.signal });
+    <span class="k">if</span> (!res.ok) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">`HTTP error: ${res.status}`</span>);
+    <span class="f">return</span> res.json();
+}</code></pre>
+            </div>
+
+            <h3 class="sub-title">1.7 สรุปเส้นทางข้อมูลใหม่</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ชั้น (Layer)</th>
+                            <th>ไฟล์</th>
+                            <th>หน้าที่</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Data Layer</td>
+                            <td><code>api.js</code> (ใหม่)</td>
+                            <td>จัดการ fetch / จำลอง API / ตรวจ error</td>
+                        </tr>
+                        <tr>
+                            <td>Logic Layer</td>
+                            <td><code>script.js</code></td>
+                            <td>เรียกใช้ api.js และวาดผล (render)</td>
+                        </tr>
+                        <tr>
+                            <td>View Layer</td>
+                            <td><code>admin.html</code></td>
+                            <td>โครงหน้าเว็บ ไม่ยุ่งกับข้อมูล</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ==================== PART 2 ==================== -->
+        <section class="section" id="part2">
+            <h2 class="section-title part-label"><span>2</span> PART 2: Login แบบ Professional (ฝั่ง Frontend)</h2>
+
+            <h3 class="sub-title">2.1 มองจากฝั่ง Frontend — ปัญหาของ login.js เดิม</h3>
+            <div class="warn">
+                <strong>⚠️ ปัญหาที่เห็นได้ชัดจากฝั่ง Frontend:</strong>
+                <ul>
+                    <li>รหัสผ่าน <code>admin/123</code> เปิดในโค้ดใครก็เห็น — อย่างน้อยควร "ปิด" การทำงานนี้ไว้เบื้องหลัง</li>
+                    <li>กดปุ่ม Enter หรือ Submit ซ้ำได้เรื่อย ๆ → ส่ง request ซ้ำ</li>
+                    <li>ไม่มี Validation — กรอกอะไรก็ส่งไปหมด</li>
+                    <li>ไม่มีสถานะ "กำลังตรวจสอบ" — ผู้ใช้ไม่รู้ว่าระบบทำงานอยู่หรือค้าง</li>
+                    <li>หน้า Admin กันแค่ <code>sessionStorage</code> ที่แก้กันง่าย</li>
+                </ul>
+                <p>Frontend ทำได้เต็มที่ 3 อย่าง: <strong>UX (หน้าตา/การแจ้งเตือน)</strong>, <strong>Validation (ตรวจความถูกต้อง)</strong>, และ <strong>Route Guard (ป้องกันหน้า)</strong></p>
+            </div>
+
+            <h3 class="sub-title">2.2 Client-side Validation — เช็คก่อนส่ง</h3>
+            <div class="code-card">
+                <div class="code-head">login/login.js — ตรวจว่ากรอกครบ + รูปแบบถูกก่อนส่ง</div>
+<pre><code><span class="f">function</span> validate(username, password) {
+    <span class="k">if</span> (!username.trim()) <span class="f">return</span> <span class="s">"กรุณากรอกชื่อผู้ใช้"</span>;
+    <span class="k">if</span> (!password)       <span class="f">return</span> <span class="s">"กรุณากรอกรหัสผ่าน"</span>;
+    <span class="k">if</span> (password.length &lt; <span class="n">3</span>) <span class="f">return</span> <span class="s">"รหัสผ่านสั้นเกินไป"</span>;
+    <span class="f">return</span> <span class="k">null</span>;   <span class="c">// ผ่านทั้งหมด → คืนค่า null (ไม่มีข้อผิดพลาด)</span>
+}
+
+<span class="c">// ใช้ใน submit handler</span>
+<span class="f">const</span> err = validate(inputUsername, inputPassword);
+<span class="k">if</span> (err) {
+    showError(err);
+    <span class="f">return</span>;   <span class="c">// หยุด ไม่ส่ง request</span>
+}</code></pre>
+            </div>
+            <div class="tip">
+                <strong>💡 หมายเหตุ:</strong> Validation ฝั่ง Frontend เป็นแค่ "ชั้นแรก" เพื่อ UX ที่ดี
+                ปลอดภัยจริงต้องตรวจซ้ำที่ Server ด้วย — แต่สำหรับเรียนจบ Frontend คือสิ่งที่เราทำได้
+            </div>
+
+            <h3 class="sub-title">2.3 UI States — Loading / Error / Success</h3>
+            <div class="code-card">
+                <div class="code-head">login/login.js — กันกดซ้ำ + แสดงสถานะทุกช่วง</div>
+<pre><code>loginForm.addEventListener(<span class="s">"submit"</span>, <span class="f">async</span> (event) =&gt; {
+    event.preventDefault();
+
+    <span class="c">// ---- Loading state: ปิดปุ่มกันกดซ้ำ + เปลี่ยนข้อความ</span>
+    submitBtn.disabled = <span class="k">true</span>;
+    submitBtn.textContent = <span class="s">"⏳ กำลังตรวจสอบ..."</span>;
+    hideError();
+
+    <span class="k">try</span> {
+        <span class="c">// จำลองการตรวจสอบ (Delay) — ต่อไปค่อยส่งไป Server ตรงนี้</span>
+        <span class="f">await new</span> <span class="f">Promise</span>(resolve =&gt; setTimeout(resolve, <span class="n">1000</span>));
+
+        <span class="k">if</span> (inputUsername === <span class="s">"admin"</span> &amp;&amp; inputPassword === <span class="s">"123"</span>) {
+            <span class="c">// ---- Success: ออกบัตรผ่าน แล้วไปหน้า Admin</span>
+            sessionStorage.setItem(<span class="s">"isLoggedIn"</span>, <span class="s">"true"</span>);
+            window.location.href = <span class="s">"../admin/admin.html"</span>;
+        } <span class="k">else</span> {
+            <span class="c">// ---- Error: แจ้งให้รู้</span>
+            showError(<span class="s">"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"</span>);
+        }
+    } <span class="k">catch</span> (err) {
+        showError(<span class="s">"เกิดข้อผิดพลาด กรุณาลองใหม่"</span>);
+    } <span class="k">finally</span> {
+        <span class="c">// คืนปุ่มเป็นปกติเสมอ (ทั้งสำเร็จและพลาด)</span>
+        submitBtn.disabled = <span class="k">false</span>;
+        submitBtn.textContent = <span class="s">"เข้าสู่ระบบ"</span>;
+    }
+});</code></pre>
+            </div>
+
+            <h3 class="sub-title">2.4 ปุ่มสลับดูรหัสผ่าน + autocomplete</h3>
+            <div class="code-card">
+                <div class="code-head">login/login.html — ฟีเจอร์ UX เล็ก ๆ ที่ทำให้ดูมืออาชีพ</div>
+<pre><code><span class="c">&lt;!-- ช่องกรอกรหัสผ่าน + ปุ่มสลับดู --&gt;</span>
+&lt;div class="password-wrap"&gt;
+    &lt;input type="password" id="password" autocomplete="current-password"&gt;
+    &lt;button type="button" id="togglePass"&gt;👁&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+            <div class="code-card">
+                <div class="code-head">login/login.js — ทำงานสลับ show/hide</div>
+<pre><code>togglePass.addEventListener(<span class="s">"click"</span>, () =&gt; {
+    <span class="f">const</span> isHidden = passwordInput.type === <span class="s">"password"</span>;
+    passwordInput.type = isHidden ? <span class="s">"text"</span> : <span class="s">"password"</span>;
+    togglePass.textContent = isHidden ? <span class="s">"🙈"</span> : <span class="s">"👁"</span>;
+});</code></pre>
+            </div>
+
+            <h3 class="sub-title">2.5 จัดการ Session อย่างถูกวิธี</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ที่เก็บ</th>
+                            <th>อยู่ได้นานแค่ไหน</th>
+                            <th>เหมาะกับ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>sessionStorage</code></td>
+                            <td>ปิดแท็บ = หาย</td>
+                            <td>บัตรผ่าน "ชั่วคราว" ของระบบนี้ ✅</td>
+                        </tr>
+                        <tr>
+                            <td><code>localStorage</code></td>
+                            <td>อยู่จนกว่าจะลบเอง</td>
+                            <td>ของที่จำข้ามครั้ง เช่น ธีม, token</td>
+                        </tr>
+                        <tr>
+                            <td>ตัวแปรใน JS</td>
+                            <td>รีเฟรชหน้า = หาย</td>
+                            <td>ค่าชั่วคราวที่ไม่ต้องเก็บ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="tip">
+                <strong>💡 ปกติระบบ Login ควรเก็บ "token" ที่ Server ออกให้</strong>
+                แต่ถ้าขอบเขตเรียนแค่ Frontend วิธีที่ยอมรับได้คือ เก็บค่าสถานะใน <code>sessionStorage</code>
+                แบบที่โปรเจกต์ทำ และปรับให้สมบูรณ์ตามข้อ 2.6–2.8
+            </div>
+
+            <h3 class="sub-title">2.6 Route Guard ฝั่งหน้าเว็บ — กันเปิดหน้า Admin ตรง ๆ</h3>
+            <div class="code-card">
+                <div class="code-head">admin/script.js — บรรทัดแรกสุดของไฟล์ (เดิมมีแล้ว ทำให้แน่นขึ้น)</div>
+<pre><code><span class="c">// 1. ยังไม่ล็อกอิน → เด้งกลับหน้า Login</span>
+<span class="k">if</span> (sessionStorage.getItem(<span class="s">"isLoggedIn"</span>) !== <span class="s">"true"</span>) {
+    <span class="c">// จำว่าตอนแรกอยากเข้าหน้าไหน (ต่อไปจะได้กลับมาที่เดิมได้)</span>
+    sessionStorage.setItem(<span class="s">"redirectAfterLogin"</span>, location.href);
+    window.location.href = <span class="s">"../login/login.html"</span>;
+    <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">"No permission"</span>);   <span class="c">// หยุดรันโค้ดที่เหลือทันที</span>
+}</code></pre>
+            </div>
+
+            <h3 class="sub-title">2.7 Auto-logout เมื่อไม่ขยับนาน (Session Timeout)</h3>
+            <div class="code-card">
+                <div class="code-head">admin/script.js — กันคนลืมล็อกเอาต์ทิ้งเครื่อง</div>
+<pre><code><span class="c">// หมดเวลา 5 นาที → ออกจากระบบอัตโนมัติ</span>
+<span class="f">const</span> TIMEOUT = <span class="n">5</span> * <span class="n">60</span> * <span class="n">1000</span>;
+<span class="f">let</span> timer;
+
+<span class="f">function</span> resetTimer() {
+    clearTimeout(timer);
+    timer = setTimeout(logout, TIMEOUT);   <span class="c">// ไม่ขยับครบเวลา → logout</span>
+}
+
+<span class="c">// ทุกครั้งที่ผู้ใช้ขยับเมาส์/พิมพ์ → นับเวลาตั้งแต่ต้น</span>
+[<span class="s">'mousemove'</span>, <span class="s">'keydown'</span>, <span class="s">'click'</span>].forEach(evt =&gt;
+    document.addEventListener(evt, resetTimer)
+);
+resetTimer();</code></pre>
+            </div>
+
+            <h3 class="sub-title">2.8 Logout ที่ล้างข้อมูลครบถ้วน</h3>
+            <div class="code-card">
+                <div class="code-head">admin/script.js — ล้างทุกอย่างที่เกี่ยวข้องกับ session</div>
+<pre><code><span class="f">function</span> logout() {
+    sessionStorage.removeItem(<span class="s">"isLoggedIn"</span>);         <span class="c">// ลบบัตรผ่าน</span>
+    sessionStorage.removeItem(<span class="s">"redirectAfterLogin"</span>);  <span class="c">// ลบที่อยู่ที่จำไว้</span>
+    window.location.href = <span class="s">"../index.html"</span>;             <span class="c">// กลับหน้าแรก</span>
+}</code></pre>
+            </div>
+
+            <!-- ============ DEMO ============ -->
+            <h3 class="sub-title">2.9 ลองเล่นจริง (Working Demo)</h3>
+            <div class="tip">
+                <strong>🎯 ลองกรอก:</strong> <code>admin</code> / <code>123</code> = เข้าสำเร็จ · กรอกผิด = แสดง error · ปุ่มสลับดูรหัสผ่าน
+                และสังเกตว่า "ปุ่มจะถูกปิดระหว่างกำลังตรวจสอบ"
+            </div>
+            <div class="demo-wrap">
+                <h4>Login Demo (Frontend)</h4>
+                <form id="demoLogin" novalidate>
+                    <div class="form-group">
+                        <label for="demoUser">ชื่อผู้ใช้</label>
+                        <input type="text" id="demoUser" placeholder="admin" autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="demoPass">รหัสผ่าน</label>
+                        <div class="password-wrap">
+                            <input type="password" id="demoPass" placeholder="••••" autocomplete="current-password">
+                            <button type="button" id="toggleDemoPass">👁</button>
+                        </div>
+                    </div>
+                    <p class="demo-error" id="demoError" hidden></p>
+                    <button type="submit" id="demoSubmit" class="demo-submit">เข้าสู่ระบบ</button>
+                    <p class="demo-success" id="demoSuccess" hidden>✅ เข้าสู่ระบบสำเร็จ! (จำลอง)</p>
+                </form>
+            </div>
+
+            <h3 class="sub-title">2.10 Checklist ฝั่ง Frontend</h3>
+            <div class="check-grid">
+                <div class="check-item"><input type="checkbox" disabled checked> มี Validation ก่อนส่ง (กรอกครบ + รูปแบบถูก)</div>
+                <div class="check-item"><input type="checkbox" disabled checked> มีสถานะ Loading (ปิดปุ่ม + เปลี่ยนข้อความ)</div>
+                <div class="check-item"><input type="checkbox" disabled checked> แสดง Error แบบอ่านเข้าใจง่าย (ภาษาไทย)</div>
+                <div class="check-item"><input type="checkbox" disabled checked> มีปุ่มสลับดูรหัสผ่าน + autocomplete ถูกต้อง</div>
+                <div class="check-item"><input type="checkbox" disabled checked> เก็บ session แบบชั่วคราว (sessionStorage)</div>
+                <div class="check-item"><input type="checkbox" disabled checked> Route Guard ป้องกันหน้า Admin เปิดตรง ๆ</div>
+                <div class="check-item"><input type="checkbox" disabled checked> Auto-logout เมื่อไม่ขยับนาน</div>
+                <div class="check-item"><input type="checkbox" disabled checked> Logout ล้างข้อมูล session ครบถ้วน</div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>Study Guide (Frontend) — Mock Data → API &amp; Professional Login · IOT · RMUTL ENGCP_3</p>
+    </footer>
+
+    <!-- Demo logic -->
+    <script>
+        const demoLogin = document.getElementById("demoLogin");
+        const demoUser = document.getElementById("demoUser");
+        const demoPass = document.getElementById("demoPass");
+        const demoError = document.getElementById("demoError");
+        const demoSuccess = document.getElementById("demoSuccess");
+        const demoSubmit = document.getElementById("demoSubmit");
+        const toggleDemoPass = document.getElementById("toggleDemoPass");
+
+        toggleDemoPass.addEventListener("click", () => {
+            const isHidden = demoPass.type === "password";
+            demoPass.type = isHidden ? "text" : "password";
+            toggleDemoPass.textContent = isHidden ? "🙈" : "👁";
+        });
+
+        demoLogin.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            demoError.hidden = true;
+            demoSuccess.hidden = true;
+
+            if (!demoUser.value.trim()) {
+                demoError.textContent = "กรุณากรอกชื่อผู้ใช้";
+                demoError.hidden = false;
+                return;
+            }
+            if (!demoPass.value) {
+                demoError.textContent = "กรุณากรอกรหัสผ่าน";
+                demoError.hidden = false;
+                return;
+            }
+
+            demoSubmit.disabled = true;
+            demoSubmit.textContent = "⏳ กำลังตรวจสอบ...";
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            if (demoUser.value.trim() === "admin" && demoPass.value === "123") {
+                demoSuccess.hidden = false;
+            } else {
+                demoError.textContent = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
+                demoError.hidden = false;
+            }
+
+            demoSubmit.disabled = false;
+            demoSubmit.textContent = "เข้าสู่ระบบ";
+        });
+    </script>
+
+</body>
+</html>

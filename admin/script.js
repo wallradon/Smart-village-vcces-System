@@ -141,10 +141,65 @@ function renderUserPage(target, params) {
     } else if (target === "vehicleDetail") {
         renderVehicleDetail(Number(params.id), Number(params.carIndex));
     } else if (target === "vehicle") {
-        // ยังไม่ได้ทำ
+        console.log(`Open VEHICLE DATA`);
+        renderVehicleList(mainData);
     } else if (target === "home") {
         // ยังไม่ได้ทำ
     }
+}
+
+// ===================== Render หน้า VEHICLE DATA (list) =====================
+/**
+ * ฟังก์ชันสำหรับ Render รายการยานพาหนะทั้งหมดทุกรอบการเข้า-ออก
+ */
+function renderVehicleList(users) {
+    const vehicleDataContainer = document.querySelector('#VehicleData');
+    if (!vehicleDataContainer) return;
+
+    let htmlContent = "";
+    let foundCount = 0;
+
+    // วนลูปดึงข้อมูลยานพาหนะของลูกบ้านทุกคน
+    users.forEach(user => {
+        if (user.vehicles && user.vehicles.length > 0) {
+            user.vehicles.forEach((vehicle) => {
+                const plate = vehicle.plate || "";
+                const type = vehicle.type || "-";
+
+                // หากมีประวัติเข้า-ออก ให้แตกรายการแสดงทีละรอบการเข้า-ออก
+                if (vehicle.timeInOut && vehicle.timeInOut.length > 0) {
+                    vehicle.timeInOut.forEach((record) => {
+                        foundCount++;
+                        const recordText = `in ${record.in ?? '-'} out ${record.out ?? '-'}`;
+
+                        htmlContent += `
+                        <div class="User VehicleRow">
+                            <h2>${plate}</h2>
+                            <h2>${type}</h2>
+                            <h2>${recordText}</h2>
+                        </div>
+                        `;
+                    });
+                } else {
+                    // หากยังไม่มีประวัติเข้า-ออก แสดง 1 แถวว่ายังไม่มีประวัติ
+                    foundCount++;
+                    htmlContent += `
+                    <div class="User VehicleRow">
+                        <h2>${plate}</h2>
+                        <h2>${type}</h2>
+                        <h2>ยังไม่มีประวัติเข้า-ออก</h2>
+                    </div>
+                    `;
+                }
+            });
+        }
+    });
+
+    if (foundCount === 0) {
+        htmlContent = `<p class="loading-text">ไม่พบข้อมูลยานพาหนะ</p>`;
+    }
+
+    vehicleDataContainer.innerHTML = htmlContent;
 }
 
 
