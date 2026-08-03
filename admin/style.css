@@ -122,6 +122,9 @@ header{
         }
         .VehicleRow, .headVehicleData {
             grid-template-columns: 10rem 10rem 1fr !important;
+            h2:last-child {
+                text-align: right;
+            }
         }
         .search-container {
             margin: 15px 0 5px 0;
