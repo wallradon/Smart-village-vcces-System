@@ -40,6 +40,11 @@
                     <h3>Login แบบ Professional (Frontend)</h3>
                     <p>Validation · UI States · Session · Route Guard · Demo ลองกดได้จริง</p>
                 </a>
+                <a href="#part3" class="toc-card">
+                    <span class="toc-num">PART 3</span>
+                    <h3>Admin System Architecture & SPA</h3>
+                    <p>สถาปัตยกรรมระบบ Admin · การสลับหน้า SPA · Data Rendering · การเตรียมพร้อม CRUD</p>
+                </a>
             </div>
         </section>
 
@@ -389,6 +394,101 @@ resetTimer();</code></pre>
                 <div class="check-item"><input type="checkbox" disabled checked> Logout ล้างข้อมูล session ครบถ้วน</div>
             </div>
 
+        </section>
+
+        <!-- ==================== PART 3 ==================== -->
+        <section class="section" id="part3">
+            <h2 class="section-title part-label"><span>3</span> PART 3: การออกแบบและสร้าง Admin System (Admin System Architecture)</h2>
+
+            <h3 class="sub-title">3.1 โครงสร้างสถาปัตยกรรมระบบ Admin (System Architecture)</h3>
+            <div class="tip">
+                <strong>💡 หลักคิดระบบ Admin:</strong> ระบบผู้ดูแลระบบที่มีประสิทธิภาพต้องเป็น <strong>Single Page Application (SPA)</strong>
+                คือผู้ใช้เปลี่ยนหน้า (Home / Vehicle / User Data) โดยไม่ต้องโหลดเว็บใหม่ ทำให้การใช้งานลื่นไหล ไม่กระตุก
+            </div>
+
+            <h3 class="sub-title">3.2 ระบบ Routing สลับหน้าจอ (SPA Navigation)</h3>
+            <div class="code-card">
+                <div class="code-head">admin/script.js — สลับหน้าจอโดยการเปลี่ยน class 'active'</div>
+<pre><code><span class="f">function</span> showPage(target, params) {
+    <span class="c">// 1. ซ่อนทุกหน้า และเอาไฮไลต์เมนูกลับเป็นปกติก่อน</span>
+    document.querySelectorAll(<span class="s">'.page'</span>).forEach(page =&gt; page.classList.remove(<span class="s">'active'</span>));
+    document.querySelectorAll(<span class="s">'nav li'</span>).forEach(li =&gt; li.classList.remove(<span class="s">'user-select'</span>));
+
+    <span class="c">// 2. แสดงเฉพาะหน้าเป้าหมาย</span>
+    <span class="f">const</span> targetPage = document.querySelector(<span class="s">`#page-${target}`</span>);
+    <span class="k">if</span> (targetPage) {
+        targetPage.classList.add(<span class="s">'active'</span>);
+        renderUserPage(target, params); <span class="c">// เรียกฟังก์ชันวาดข้อมูลของหน้านั้น</span>
+    }
+
+    <span class="c">// 3. ไฮไลต์เมนูที่เลือก</span>
+    <span class="f">const</span> activeLi = document.querySelector(<span class="s">`nav li[data-target="${target}"]`</span>);
+    <span class="k">if</span> (activeLi) activeLi.classList.add(<span class="s">'user-select'</span>);
+}</code></pre>
+            </div>
+
+            <h3 class="sub-title">3.3 การดึงและวนลูปแสดงข้อมูลแบบ Nested Data (Relational Rendering)</h3>
+            <div class="code-card">
+                <div class="code-head">admin/script.js — แตกรายการเข้า-ออกของยานพาหนะทุกคัน (Nested Loops)</div>
+<pre><code><span class="f">function</span> renderVehicleList(users) {
+    <span class="f">const</span> container = document.querySelector(<span class="s">'#VehicleData'</span>);
+    <span class="f">let</span> html = <span class="s">""</span>;
+
+    users.forEach(user =&gt; {
+        <span class="k">if</span> (user.vehicles &amp;&amp; user.vehicles.length &gt; <span class="n">0</span>) {
+            user.vehicles.forEach(vehicle =&gt; {
+                <span class="c">// วนลูปอ่านประวัติการเข้า-ออกย่อยทุกรอบ</span>
+                <span class="k">if</span> (vehicle.timeInOut &amp;&amp; vehicle.timeInOut.length &gt; <span class="n">0</span>) {
+                    vehicle.timeInOut.forEach(record =&gt; {
+                        html += <span class="s">`
+                        &lt;div class="User VehicleRow"&gt;
+                            &lt;h2&gt;${vehicle.type}&lt;/h2&gt;
+                            &lt;h2&gt;${vehicle.plate}&lt;/h2&gt;
+                            &lt;h2&gt;in ${record.in} out ${record.out}&lt;/h2&gt;
+                        &lt;/div&gt;`</span>;
+                    });
+                }
+            });
+        }
+    });
+    container.innerHTML = html;
+}</code></pre>
+            </div>
+
+            <h3 class="sub-title">3.4 การเตรียมความพร้อมรองรับ CRUD กับ Backend ในอนาคต</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>การทำงาน (CRUD)</th>
+                            <th>HTTP Method</th>
+                            <th>หน้าที่ในฝั่ง Frontend Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Create</strong> (สร้าง)</td>
+                            <td><code>POST</code></td>
+                            <td>ส่งข้อมูลยานพาหนะ / ลูกบ้านใหม่ ไปบันทึกในระบบ</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Read</strong> (อ่าน)</td>
+                            <td><code>GET</code></td>
+                            <td>ดึงรายการลูกบ้าน และเวลาเข้า-ออกรถยนต์มาแสดง</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Update</strong> (แก้ไข)</td>
+                            <td><code>PUT / PATCH</code></td>
+                            <td>อัปเดตข้อมูลบ้านเลขที่ ป้ายทะเบียน หรือสถานะสมาชิก</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Delete</strong> (ลบ)</td>
+                            <td><code>DELETE</code></td>
+                            <td>ยกเลิกข้อมูลลูกบ้าน หรือลบป้ายทะเบียนออกจากระบบ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
 
     </main>
