@@ -1,6 +1,13 @@
-# Sensitive Data / Environments
-.env
-.env.local
+# Configuration files (ซ่อนไฟล์ความลับ)
+admin/config.js
 
 # Dependency folders
 node_modules/
+
+# IDE / Editor files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db

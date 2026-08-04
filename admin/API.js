@@ -1,18 +1,14 @@
-// API Configuration (ดึงจากตัวแปรส่วนกลางเพื่อความปลอดภัย)
-// เมื่อใช้ Build Tool เช่น Vite จะเปลี่ยนเป็น: import.meta.env.VITE_API_BASE_URL
-const CONFIG = {
-    API_BASE_URL: typeof process !== 'undefined' && process.env.API_BASE_URL ? process.env.API_BASE_URL : '/api',
-    API_KEY: typeof process !== 'undefined' && process.env.API_KEY ? process.env.API_KEY : ''
-};
+// API URL Configuration
+// ดึงค่า URL หลักมาจาก config.js
+const API_BASE_URL = CONFIG.API_BASE_URL;
 
 // POST USER
 async function createUser(userData) {
     try {
-        const response = await fetch(`${CONFIG.API_BASE_URL}/users/createUser`, {
+        const response = await fetch(`${API_BASE_URL}/users/createUser`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'X-API-Key': CONFIG.API_KEY
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(userData)
         });
@@ -32,14 +28,11 @@ async function createUser(userData) {
         throw error; // ให้ส่วนที่เรียกใช้ไปจัดการ error ต่อ (เช่น แสดง alert)
     }
 }
+
 // GET USER
 async function getUser() {
     try {
-        const response = await fetch(`${CONFIG.API_BASE_URL}/users/getUsers`, {
-            headers: {
-                'X-API-Key': CONFIG.API_KEY
-            }
-        });
+        const response = await fetch(`${API_BASE_URL}/users/getUsers`);
 
         const result = await response.json();
 
@@ -52,17 +45,16 @@ async function getUser() {
         return result;
 
     } catch (error) {
-        console.error('createUser error:', error.message);
+        console.error('getUser error:', error.message);
         throw error; // ให้ส่วนที่เรียกใช้ไปจัดการ error ต่อ (เช่น แสดง alert)
     }
 }
-
 
 async function testData() {
     const userData = {
         houseNumber: "1",
         ownerName: "1",
-        username: "2",
+        username: "ๅๅๅ",
         password: "1",
         role: "USER",
         registerDate: "99/2/99",
@@ -79,10 +71,13 @@ async function testData() {
 }
 
 async function testDB() {
-    // await testData() ;
-    await getUser() ;
+    await testData();
+    await getUser();
 }
+
 const BTN = document.querySelector(".PBTN");
-BTN.addEventListener("click",(e) => {
-    testDB();
-});
+if (BTN) {
+    BTN.addEventListener("click", (e) => {
+        testDB();
+    });
+}
