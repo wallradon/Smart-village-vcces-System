@@ -20,13 +20,13 @@ flowchart TD
     L --> M{Fetch ข้อมูล<br/>admin/dataTest.json}
     M -->|"รอ 3 วิ (จำลอง)"| N[สถานะ Loading<br/>Loading data...]
     N --> O{HTTP Status 200-299?}
-    O -->|ไม่| P[แสดงข้อความ Error<br/>Data loading error (Code)]
+    O -->|ไม่| P["แสดงข้อความ Error<br/>Data loading error (Code)"]
     O -->|ใช่| Q[เก็บข้อมูลลง mainData]
     Q --> R[Render หน้าแสดงผล]
     P --> R
 
     R --> S{เลือกเมนูใน Nav}
-    S -->|HOME| T[หน้า Home<br/>(ยังไม่ได้ทำ)]
+    S -->|HOME| T["หน้า Home<br/>(ยังไม่ได้ทำ)"]
     S -->|VEHICLE DATA| U[แสดงรายการยานพาหนะ<br/>ประเภท / ทะเบียน / เวลาเข้า-ออก]
     S -->|USER DATA| V[แสดงรายการลูกบ้าน<br/>ลำดับ / เลขที่บ้าน]
     V --> W[คลิก 'แสดงข้อมูลเพิ่มเติม']
@@ -47,10 +47,10 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     actor ผู้ใช้ as User
-    participant LP as Landing Page<br/>(index.html)
-    participant LG as Login Module<br/>(login/)
-    participant AD as Admin Dashboard<br/>(admin/admin.html + script.js)
-    participant JSON as Mock Data<br/>(admin/dataTest.json)
+    participant LP as "Landing Page<br/>(index.html)"
+    participant LG as "Login Module<br/>(login/)"
+    participant AD as "Admin Dashboard<br/>(admin/admin.html + script.js)"
+    participant JSON as "Mock Data<br/>(admin/dataTest.json)"
 
     ผู้ใช้->>LP: เปิดหน้าเว็บ
     LP->>LP: เช็ก sessionStorage.isLoggedIn
