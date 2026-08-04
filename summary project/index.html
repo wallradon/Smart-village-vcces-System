@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Village VCCES System - Project Summary</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="hero">
+        <div class="container hero-container">
+            <div class="hero-badge">PROJECT SUMMARY & ARCHITECTURE</div>
+            <h1>Smart Village VCCES System</h1>
+            <p class="subtitle">ระบบจัดการข้อมูลลูกบ้าน ยานพาหนะ และเวลาเข้า-ออก โครงการหมู่บ้านจัดสรรอัจฉริยะ (IoT)</p>
+            <div class="meta-info">
+                <span>📍 RMUTL ENGCP_3</span>
+                <span>🏷️ Frontend & Data Layer</span>
+                <span>⚡ Responsive & SPA</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Section 1: Overview -->
+        <section class="card">
+            <h2>📌 ภาพรวมโปรเจกต์ (Project Overview)</h2>
+            <p><strong>Smart Village VCCES System</strong> เป็นเว็บแอปพลิเคชันสำหรับบริหารจัดการและตรวจสอบข้อมูลภายในหมู่บ้านอัจฉริยะ ออกแบบมาเพื่อเป็นส่วนหน้าจอ (Frontend Interface) ในการเชื่อมต่อกับระบบฮาร์ดแวร์ IoT เช่น กล้องอ่านป้ายทะเบียนอัตโนมัติ (LPR) และระบบไม้กั้นสแกนเข้า-ออก</p>
+        </section>
+
+        <!-- Section 2: Features -->
+        <section class="card">
+            <h2>🚀 ฟีเจอร์หลักของระบบ (Main Features)</h2>
+            <div class="grid-2">
+                <div class="feature-item">
+                    <h3>🔐 1. Authentication & Route Protection</h3>
+                    <ul>
+                        <li>ตรวจสอบสิทธิ์การเข้าใช้งาน (Login Guard) ด้วย <code>sessionStorage</code></li>
+                        <li>หากยังไม่ได้ล็อกอิน จะดีดกลับไปยังหน้า <code>login.html</code> อัตโนมัติ</li>
+                        <li>ระบบ Logout ล้าง Session ชั่วคราวปลอดภัย</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>📱 2. Single Page Application (SPA) Navigation</h3>
+                    <ul>
+                        <li>การสลับหน้าจอ (Home, Vehicle Data, User Data) โดยไม่ต้องโหลดเว็บใหม่</li>
+                        <li>ใช้ Attribute <code>data-target</code> ในการควบคุมการเปิด-ปิด <code>.page</code></li>
+                        <li>ระบบไฮไลต์แถบเมนูข้าง (Sidebar Navigation) ให้ตรงกับหน้าปัจจุบัน</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>🚗 3. Vehicle Entry-Exit Monitoring</h3>
+                    <ul>
+                        <li>แสดงรายการประวัติการเข้า-ออกยานพาหนะทุกรอบการเข้าออก</li>
+                        <li>แสดงประเภทรถ (Car / Motorcycle), ทะเบียนรถ และเวลาเข้า-ออก (`in ... out ...`)</li>
+                        <li>จัดเรียงตำแหน่งคอลัมน์และข้อความชิดซ้าย/กลาง/ขวาเพื่อความสบายตา</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>👥 4. Resident & Data Layer Architecture</h3>
+                    <ul>
+                        <li>ดึงและประมวลผลข้อมูลจากไฟล์ JSON จำลอง (`dataTest.json`)</li>
+                        <li>แสดงรายชื่อลูกบ้าน บ้านเลขที่ วันสมัครสมาชิก และวันหมดอายุ</li>
+                        <li>รองรับโครงสร้างแบบ Nested Array (ลูกบ้าน 1 คน มีรถหลายคัน และมีประวัติเข้าออกหลายรอบ)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Folder Structure -->
+        <section class="card">
+            <h2>📁 โครงสร้างโฟลเดอร์ของโปรเจกต์ (Directory Structure)</h2>
+            <div class="code-block">
+<pre>Smart-village-vcces-System/
+├── index.html              # หน้า Landing Page หลักของเว็บไซต์
+├── indexStyle.css          # สไตล์ CSS หน้า Landing Page
+├── admin/                  # ระบบผู้ดูแลระบบ (Admin Panel)
+│   ├── admin.html          # หน้าแรก Admin รวมทุก Section (SPA)
+│   ├── style.css           # สไตล์ตกแต่งระบบ Admin
+│   ├── script.js          # Logic หลักการสลับหน้า และ Render ข้อมูล
+│   └── dataTest.json       # ข้อมูลจำลองลูกบ้าน ยานพาหนะ และเวลาเข้า-ออก
+├── login/                  # ระบบเข้าสู่ระบบ
+│   ├── login.html          # หน้าฟอร์มล็อกอิน
+│   ├── login.js            # ตรวจสอบสิทธิ์การเข้าสู่ระบบ
+│   └── loginStyle.css      # สไตล์ตกแต่งหน้าล็อกอิน
+├── other/                  # บทเรียนและคู่มือพัฒนาโปรเจกต์
+│   ├── study.html          # คู่มือการเรียนรู้ Mock Data -> API & Admin Architecture
+│   └── study.css           # สไตล์ตกแต่งหน้าคู่มือเรียนรู้ (Responsive)
+└── summary project/        # [ใหม่] สรุปรายละเอียดโปรเจกต์
+    ├── index.html          # หน้าสรุปภาพรวมและสถาปัตยกรรมโปรเจกต์
+    └── style.css           # สไตล์ตกแต่งหน้าสรุปโปรเจกต์
+</pre>
+            </div>
+        </section>
+
+        <!-- Section 4: Tech Stack -->
+        <section class="card">
+            <h2>🛠️ เทคโนโลยีที่ใช้ (Technology Stack)</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>เทคโนโลยี / ส่วนประกอบ</th>
+                            <th>รายละเอียด & หน้าที่</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>HTML5</strong></td>
+                            <td>โครงสร้างหน้าเว็บแบบ Semantic Elements และ SPA Containers</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vanilla CSS3</strong></td>
+                            <td>การจัดตกแต่งด้วย CSS Variables, Flexbox, Grid Layout และ Responsive Media Queries</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vanilla JavaScript (ES6+)</strong></td>
+                            <td>Async/Await, Fetch API, Event Delegation, DOM Manipulation และ Session Management</td>
+                        </tr>
+                        <tr>
+                            <td><strong>JSON (Mock Data)</strong></td>
+                            <td>จำลองโครงสร้างข้อมูลจาก Backend API สำหรับทดสอบระบบ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 5: Future Enhancements -->
+        <section class="card">
+            <h2>🔮 แผนการพัฒนาต่อยอดในอนาคต (Future Enhancements)</h2>
+            <div class="roadmap-list">
+                <div class="roadmap-item">
+                    <span class="badge">Backend Integration</span>
+                    <p>เชื่อมต่อกับ RESTful API หรือ Firebase / Node.js Express แทนการใช้ `dataTest.json`</p>
+                </div>
+                <div class="roadmap-item">
+                    <span class="badge">Hardware & IoT</span>
+                    <p>เชื่อมต่อสัญญาณจากกล้องอ่านป้ายทะเบียน (LPR) และเซ็นเซอร์เปิด-ปิดไม้กั้นแบบ Real-time</p>
+                </div>
+                <div class="roadmap-item">
+                    <span class="badge">CRUD Operations</span>
+                    <p>เพิ่มฟอร์มสำหรับ เพิ่ม/แก้ไข/ลบ ข้อมูลลูกบ้าน และลงทะเบียนป้ายทะเบียนรถใหม่ผ่านหน้า Admin</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Smart Village VCCES System &copy; 2026 — RMUTL ENGCP_3 Project Summary</p>
+        </div>
+    </footer>
+
+</body>
+</html>
