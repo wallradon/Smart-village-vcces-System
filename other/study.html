@@ -31,470 +31,479 @@
             <h2 class="section-title"><span>0</span> สารบัญ</h2>
             <div class="toc-grid">
                 <a href="#part1" class="toc-card">
-                    <span class="toc-num">PART 1</span>
-                    <h3>Mock Data → API (Frontend)</h3>
-                    <p>แยก Data Layer · จัดการ loading/error/success · fetch จริงหรือจำลอง</p>
+                    <span class="toc-num">LESSON 1</span>
+                    <h3>Node.js & Express API Server Guide</h3>
+                    <p>การสร้าง Express API Server ฉบับสมบูรณ์ · RESTful Endpoints · CORS · Middleware · JSON Reading/Writing</p>
                 </a>
                 <a href="#part2" class="toc-card">
-                    <span class="toc-num">PART 2</span>
-                    <h3>Login แบบ Professional (Frontend)</h3>
-                    <p>Validation · UI States · Session · Route Guard · Demo ลองกดได้จริง</p>
-                </a>
-                <a href="#part3" class="toc-card">
-                    <span class="toc-num">PART 3</span>
-                    <h3>Admin System Architecture & SPA</h3>
-                    <p>สถาปัตยกรรมระบบ Admin · การสลับหน้า SPA · Data Rendering · การเตรียมพร้อม CRUD</p>
+                    <span class="toc-num">DOCUMENTATION</span>
+                    <h3>API Specification & Contract Template</h3>
+                    <p>แม่แบบเอกสารข้อตกลง API (API Specs) · สำหรับส่งให้ทีม Backend ทำ Express API ให้ตรงกับที่เราต้องการ</p>
                 </a>
             </div>
         </section>
 
-        <!-- ==================== PART 1 ==================== -->
+        <!-- ==================== MAIN CONTENT: EXPRESS API SERVER ==================== -->
         <section class="section" id="part1">
-            <h2 class="section-title part-label"><span>1</span> PART 1: จาก Mock Data → API (ฝั่ง Frontend)</h2>
+            <h2 class="section-title part-label"><span>1</span> คู่มือการสร้าง Express API Server ฉบับสมบูรณ์ (Express.js Backend Mastery)</h2>
 
-            <h3 class="sub-title">1.1 มุมมองของ Frontend</h3>
+            <h3 class="sub-title">1.1 ทำความเข้าใจสถาปัตยกรรม Express API (Server Mechanics)</h3>
             <div class="tip">
-                <strong>💡 หลักคิดสำคัญ:</strong> ฝั่ง Frontend ไม่ต้องรู้ว่าข้อมูลมาจากไฟล์ JSON ในเครื่อง หรือจาก Server ที่อยู่ไกล
-                หน้าที่ของเราคือ <strong>"ส่งคำขอ (Request) แล้วรอผลตอบกลับ (Response) มาแสดงผล"</strong>
-                การเขียนให้เป็นระเบียบจะทำให้ทีหลังเปลี่ยนแหล่งข้อมูลได้โดยไม่ต้องแก้หน้า HTML เลย
+                <strong>💡 นิยามของ Express API Server:</strong> Express เป็น Web Framework สำหรับ Node.js ที่ทำหน้าที่เปิดพอร์ต (Port) รอรับ <strong>HTTP Requests</strong> (GET, POST, PUT, DELETE) จากไคลเอ็นต์ จากนั้นนำข้อมูลจากไฟล์ (เช่น <code>dataTest.json</code>) หรือฐานข้อมูล มาประมวลผล แล้วส่งกลับไปในรูปแบบ <strong>JSON (JavaScript Object Notation)</strong> พร้อม <strong>HTTP Status Code</strong> ที่เหมาะสม
             </div>
 
-            <h3 class="sub-title">1.2 ขั้นตอนที่ 1 — แยก Data Layer ออกเป็นไฟล์ <code>api.js</code></h3>
-            <div class="code-card">
-                <div class="code-head">admin/api.js — สร้างไฟล์ใหม่ไว้จัดการข้อมูลทั้งหมด (Separation of Concerns)</div>
-<pre><code><span class="c">// ไฟล์นี้มีหน้าที่เดียว: รับส่งข้อมูลกับแหล่งข้อมูล (Data Layer)</span>
-<span class="c">// โค้ดหน้า UI จะเรียกใช้แค่ฟังก์ชันพวกนี้ ไม่ต้องรู้ที่มาของข้อมูล</span>
-
-<span class="f">const</span> API = {
-
-    <span class="c">// เรียกข้อมูลลูกบ้านทั้งหมด</span>
-    <span class="f">async</span> getUsers() {
-        <span class="f">const</span> res = <span class="f">await</span> fetch(<span class="s">"./dataTest.json"</span>);
-        <span class="k">if</span> (!res.ok) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">`HTTP error: ${res.status}`</span>);
-        <span class="f">return</span> res.json();
-    },
-
-    <span class="c">// เรียกข้อมูลลูกบ้านคนเดียว</span>
-    <span class="f">async</span> getUser(id) {
-        <span class="f">const</span> res = <span class="f">await</span> fetch(<span class="s">`./dataTest.json`</span>);
-        <span class="k">if</span> (!res.ok) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">`HTTP error: ${res.status}`</span>);
-        <span class="f">const</span> users = <span class="f">await</span> res.json();
-        <span class="f">return</span> users.find(u =&gt; u.id === <span class="f">Number</span>(id));
-    }
-};</code></pre>
-            </div>
-            <div class="tip">
-                <strong>💡 ประโยชน์:</strong> ต่อไปถ้ามี Server จริง แค่เปลี่ยนบรรทัด URL ในไฟล์ <code>api.js</code> ที่เดียว
-                ส่วน <code>script.js</code> (การแสดงผล) ไม่ต้องแตะเลย
-            </div>
-
-            <h3 class="sub-title">1.3 ขั้นตอนที่ 2 — จำลอง API ด้วย Promise (เมื่อยังไม่มี Server)</h3>
-            <div class="code-card">
-                <div class="code-head">admin/api.js — จำลองความล่าช้าของเครือข่าย (ดูเหมือน API จริง)</div>
-<pre><code><span class="f">const</span> API = {
-
-    <span class="f">async</span> getUsers() {
-        <span class="c">// จำลองว่า Server ใช้เวลาตอบ 1.5 วิ (ตอน dev จะได้เห็น loading state)</span>
-        <span class="f">await new</span> <span class="f">Promise</span>(resolve =&gt; setTimeout(resolve, <span class="n">1500</span>));
-        <span class="f">const</span> res = <span class="f">await</span> fetch(<span class="s">"./dataTest.json"</span>);
-        <span class="k">if</span> (!res.ok) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">`HTTP error: ${res.status}`</span>);
-        <span class="f">return</span> res.json();
-    },
-
-    <span class="c">// จำลอง error (เพื่อทดสอบหน้าแสดงข้อผิดพลาด)</span>
-    <span class="f">async</span> getUsersFail() {
-        <span class="f">await new</span> <span class="f">Promise</span>(resolve =&gt; setTimeout(resolve, <span class="n">1500</span>));
-        <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">"Network error"</span>);   <span class="c">// ปล่อยให้ฝั่ง caller จัดการ</span>
-    }
-};</code></pre>
-            </div>
-
-            <h3 class="sub-title">1.4 ขั้นตอนที่ 3 — ใช้ Async/Await + try/catch ในหน้าแสดงผล</h3>
-            <div class="code-card">
-                <div class="code-head">admin/script.js — ดึงข้อมูลผ่าน Data Layer (โค้ดสะอาดกว่าเดิม)</div>
-<pre><code><span class="f">async function</span> <span class="f">load</span>() {
-    setLoading();   <span class="c">// 1. แสดงสถานะ "กำลังโหลด"</span>
-    <span class="k">try</span> {
-        mainData = <span class="f">await</span> API.getUsers();   <span class="c">// 2. ขอข้อมูล</span>
-        renderUserList(mainData);            <span class="c">// 3. วาดข้อมูลลงหน้า</span>
-    } <span class="k">catch</span> (err) {
-        showError(err.message);              <span class="c">// 4. มีปัญหา → แสดง error</span>
-    }
-}</code></pre>
-            </div>
-
-            <h3 class="sub-title">1.5 ขั้นตอนที่ 4 — จัดการ 3 สถานะ: Loading / Error / Success</h3>
             <div class="flow">
-                <div class="flow-step"><strong>Loading</strong><br>แสดงข้อความ/ตัวหมุน (spinner) ขณะรอ</div>
-                <div class="flow-arrow">→</div>
-                <div class="flow-step"><strong>Error</strong><br>แสดงข้อความแจ้ง + เปิดปุ่มลองใหม่</div>
-                <div class="flow-arrow">→</div>
-                <div class="flow-step"><strong>Success</strong><br>วาดข้อมูลจริงบนหน้า</div>
+                <div class="flow-step"><strong>Client (Frontend / Postman)</strong><br>ส่ง <code>HTTP Request</code> + Headers/Body</div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step"><strong>Express Middlewares</strong><br><code>cors()</code>, <code>express.json()</code></div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step"><strong>Route Controllers</strong><br>อ่าน/เขียน <code>dataTest.json</code></div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step"><strong>JSON Response</strong><br><code>res.status(200).json(...)</code></div>
             </div>
+
+            <h3 class="sub-title">1.2 ขั้นตอนการตั้งค่าโปรเจกต์ (Environment Setup Step-by-Step)</h3>
+            <p style="margin-bottom: 12px;">เปิด Terminal ในไดเรกทอรีที่ต้องการสร้าง Server แล้วรันคำสั่งตามลำดับ:</p>
             <div class="code-card">
-                <div class="code-head">admin/script.js — ฟังก์ชันจัดการสถานะ</div>
-<pre><code><span class="f">function</span> setLoading() {
-    UserData.innerHTML = <span class="s">`&lt;p class="loading-text"&gt;⏳ Loading data...&lt;/p&gt;`</span>;
-}
+                <div class="code-head">Terminal — การเริ่มต้นโปรเจกต์ Node.js &amp; Express</div>
+<pre><code><span class="c"># Step 1: สร้างไฟล์ package.json เพื่อจัดการ Dependencies</span>
+npm init -y
 
-<span class="f">function</span> showError(msg) {
-    UserData.innerHTML = <span class="s">`&lt;p class="loading-text" style="color:red"&gt;
-        ❌ ${msg} — &lt;button onclick="load()"&gt;ลองใหม่&lt;/button&gt;&lt;/p&gt;`</span>;
-}</code></pre>
+<span class="c"># Step 2: ติดตั้ง Express (Web Framework) และ CORS (จัดการ Cross-Origin Policy)</span>
+npm install express cors
+
+<span class="c"># Step 3: ติดตั้ง Nodemon สำหรับ auto-reload เซิร์ฟเวอร์เมื่อมีการบันทึกไฟล์ (Dev Dependency)</span>
+npm install --save-dev nodemon
+
+<span class="c"># Step 4: เพิ่ม script ใน package.json เพื่อความสะดวกในการรัน</span>
+<span class="c"># "scripts": { "start": "node server.js", "dev": "nodemon server.js" }</span></code></pre>
             </div>
 
-            <h3 class="sub-title">1.6 เทคนิคขั้นสูง — ยกเลิก request ที่ไม่ต้องการ (AbortController)</h3>
+            <h3 class="sub-title">1.3 โค้ด Express API Server ฉบับสมบูรณ์ (Complete <code>server.js</code>)</h3>
+            <p style="margin-bottom: 12px;">โค้ดชุดนี้รวมการอ่านไฟล์ JSON, Middleware, Error Handling, CRUD Endpoints และ Authentication ไว้ครบถ้วน:</p>
             <div class="code-card">
-                <div class="code-head">admin/api.js — ยกเลิก fetch ถ้าผู้ใช้เปลี่ยนหน้าเร็วเกินไป</div>
-<pre><code><span class="f">let</span> currentAbort = <span class="k">null</span>;
+                <div class="code-head">server.js — ฉบับเต็ม (มีระบบอ่าน-เขียนไฟล์ JSON และจัดการ Error ครอบคลุม)</div>
+<pre><code><span class="f">const</span> express = <span class="f">require</span>(<span class="s">"express"</span>);
+<span class="f">const</span> cors = <span class="f">require</span>(<span class="s">"cors"</span>);
+<span class="f">const</span> fs = <span class="f">require</span>(<span class="s">"fs"</span>);
+<span class="f">const</span> path = <span class="f">require</span>(<span class="s">"path"</span>);
 
-<span class="f">async</span> getUsers() {
-    <span class="c">// ยกเลิก request ก่อนหน้า (ถ้ายังไม่เสร็จ) กันข้อมูลมาซ้อนกัน</span>
-    <span class="k">if</span> (currentAbort) currentAbort.abort();
-    currentAbort = <span class="k">new</span> <span class="f">AbortController</span>();
+<span class="f">const</span> app = express();
+<span class="f">const</span> PORT = process.env.PORT || <span class="n">3000</span>;
+<span class="f">const</span> DATA_FILE = path.join(__dirname, <span class="s">"admin"</span>, <span class="s">"dataTest.json"</span>);
 
-    <span class="f">const</span> res = <span class="f">await</span> fetch(<span class="s">"./dataTest.json"</span>, { signal: currentAbort.signal });
-    <span class="k">if</span> (!res.ok) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">`HTTP error: ${res.status}`</span>);
-    <span class="f">return</span> res.json();
-}</code></pre>
-            </div>
+<span class="c">// ==================== 1. MIDDLEWARES ====================</span>
+<span class="c">// อนุญาตให้เว็บจาก Origin อื่น (เช่น Frontend) ดึง API ได้</span>
+app.use(cors());
 
-            <h3 class="sub-title">1.7 สรุปเส้นทางข้อมูลใหม่</h3>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ชั้น (Layer)</th>
-                            <th>ไฟล์</th>
-                            <th>หน้าที่</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Data Layer</td>
-                            <td><code>api.js</code> (ใหม่)</td>
-                            <td>จัดการ fetch / จำลอง API / ตรวจ error</td>
-                        </tr>
-                        <tr>
-                            <td>Logic Layer</td>
-                            <td><code>script.js</code></td>
-                            <td>เรียกใช้ api.js และวาดผล (render)</td>
-                        </tr>
-                        <tr>
-                            <td>View Layer</td>
-                            <td><code>admin.html</code></td>
-                            <td>โครงหน้าเว็บ ไม่ยุ่งกับข้อมูล</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+<span class="c">// แปลง JSON Body จาก Request (req.body) ให้อยู่ในรูปแบบ JavaScript Object</span>
+app.use(express.json());
 
-        <!-- ==================== PART 2 ==================== -->
-        <section class="section" id="part2">
-            <h2 class="section-title part-label"><span>2</span> PART 2: Login แบบ Professional (ฝั่ง Frontend)</h2>
+<span class="c">// Custom Logging Middleware สำหรับบันทึกการเรียกใช้งาน API ทุกครั้ง</span>
+app.use((req, res, next) =&gt; {
+    console.log(<span class="s">`[${new Date().toISOString()}] ${req.method} ${req.url}`</span>);
+    next();
+});
 
-            <h3 class="sub-title">2.1 มองจากฝั่ง Frontend — ปัญหาของ login.js เดิม</h3>
-            <div class="warn">
-                <strong>⚠️ ปัญหาที่เห็นได้ชัดจากฝั่ง Frontend:</strong>
-                <ul>
-                    <li>รหัสผ่าน <code>admin/123</code> เปิดในโค้ดใครก็เห็น — อย่างน้อยควร "ปิด" การทำงานนี้ไว้เบื้องหลัง</li>
-                    <li>กดปุ่ม Enter หรือ Submit ซ้ำได้เรื่อย ๆ → ส่ง request ซ้ำ</li>
-                    <li>ไม่มี Validation — กรอกอะไรก็ส่งไปหมด</li>
-                    <li>ไม่มีสถานะ "กำลังตรวจสอบ" — ผู้ใช้ไม่รู้ว่าระบบทำงานอยู่หรือค้าง</li>
-                    <li>หน้า Admin กันแค่ <code>sessionStorage</code> ที่แก้กันง่าย</li>
-                </ul>
-                <p>Frontend ทำได้เต็มที่ 3 อย่าง: <strong>UX (หน้าตา/การแจ้งเตือน)</strong>, <strong>Validation (ตรวจความถูกต้อง)</strong>, และ <strong>Route Guard (ป้องกันหน้า)</strong></p>
-            </div>
-
-            <h3 class="sub-title">2.2 Client-side Validation — เช็คก่อนส่ง</h3>
-            <div class="code-card">
-                <div class="code-head">login/login.js — ตรวจว่ากรอกครบ + รูปแบบถูกก่อนส่ง</div>
-<pre><code><span class="f">function</span> validate(username, password) {
-    <span class="k">if</span> (!username.trim()) <span class="f">return</span> <span class="s">"กรุณากรอกชื่อผู้ใช้"</span>;
-    <span class="k">if</span> (!password)       <span class="f">return</span> <span class="s">"กรุณากรอกรหัสผ่าน"</span>;
-    <span class="k">if</span> (password.length &lt; <span class="n">3</span>) <span class="f">return</span> <span class="s">"รหัสผ่านสั้นเกินไป"</span>;
-    <span class="f">return</span> <span class="k">null</span>;   <span class="c">// ผ่านทั้งหมด → คืนค่า null (ไม่มีข้อผิดพลาด)</span>
-}
-
-<span class="c">// ใช้ใน submit handler</span>
-<span class="f">const</span> err = validate(inputUsername, inputPassword);
-<span class="k">if</span> (err) {
-    showError(err);
-    <span class="f">return</span>;   <span class="c">// หยุด ไม่ส่ง request</span>
-}</code></pre>
-            </div>
-            <div class="tip">
-                <strong>💡 หมายเหตุ:</strong> Validation ฝั่ง Frontend เป็นแค่ "ชั้นแรก" เพื่อ UX ที่ดี
-                ปลอดภัยจริงต้องตรวจซ้ำที่ Server ด้วย — แต่สำหรับเรียนจบ Frontend คือสิ่งที่เราทำได้
-            </div>
-
-            <h3 class="sub-title">2.3 UI States — Loading / Error / Success</h3>
-            <div class="code-card">
-                <div class="code-head">login/login.js — กันกดซ้ำ + แสดงสถานะทุกช่วง</div>
-<pre><code>loginForm.addEventListener(<span class="s">"submit"</span>, <span class="f">async</span> (event) =&gt; {
-    event.preventDefault();
-
-    <span class="c">// ---- Loading state: ปิดปุ่มกันกดซ้ำ + เปลี่ยนข้อความ</span>
-    submitBtn.disabled = <span class="k">true</span>;
-    submitBtn.textContent = <span class="s">"⏳ กำลังตรวจสอบ..."</span>;
-    hideError();
-
+<span class="c">// ==================== 2. HELPER FUNCTIONS ====================</span>
+<span class="c">// อ่านข้อมูลจากไฟล์ dataTest.json</span>
+<span class="f">function</span> readData() {
     <span class="k">try</span> {
-        <span class="c">// จำลองการตรวจสอบ (Delay) — ต่อไปค่อยส่งไป Server ตรงนี้</span>
-        <span class="f">await new</span> <span class="f">Promise</span>(resolve =&gt; setTimeout(resolve, <span class="n">1000</span>));
-
-        <span class="k">if</span> (inputUsername === <span class="s">"admin"</span> &amp;&amp; inputPassword === <span class="s">"123"</span>) {
-            <span class="c">// ---- Success: ออกบัตรผ่าน แล้วไปหน้า Admin</span>
-            sessionStorage.setItem(<span class="s">"isLoggedIn"</span>, <span class="s">"true"</span>);
-            window.location.href = <span class="s">"../admin/admin.html"</span>;
-        } <span class="k">else</span> {
-            <span class="c">// ---- Error: แจ้งให้รู้</span>
-            showError(<span class="s">"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"</span>);
-        }
+        <span class="f">const</span> raw = fs.readFileSync(DATA_FILE, <span class="s">"utf8"</span>);
+        <span class="f">return</span> JSON.parse(raw);
     } <span class="k">catch</span> (err) {
-        showError(<span class="s">"เกิดข้อผิดพลาด กรุณาลองใหม่"</span>);
-    } <span class="k">finally</span> {
-        <span class="c">// คืนปุ่มเป็นปกติเสมอ (ทั้งสำเร็จและพลาด)</span>
-        submitBtn.disabled = <span class="k">false</span>;
-        submitBtn.textContent = <span class="s">"เข้าสู่ระบบ"</span>;
+        console.error(<span class="s">"Error reading JSON file:"</span>, err);
+        <span class="f">return</span> [];
     }
-});</code></pre>
-            </div>
-
-            <h3 class="sub-title">2.4 ปุ่มสลับดูรหัสผ่าน + autocomplete</h3>
-            <div class="code-card">
-                <div class="code-head">login/login.html — ฟีเจอร์ UX เล็ก ๆ ที่ทำให้ดูมืออาชีพ</div>
-<pre><code><span class="c">&lt;!-- ช่องกรอกรหัสผ่าน + ปุ่มสลับดู --&gt;</span>
-&lt;div class="password-wrap"&gt;
-    &lt;input type="password" id="password" autocomplete="current-password"&gt;
-    &lt;button type="button" id="togglePass"&gt;👁&lt;/button&gt;
-&lt;/div&gt;</code></pre>
-            </div>
-            <div class="code-card">
-                <div class="code-head">login/login.js — ทำงานสลับ show/hide</div>
-<pre><code>togglePass.addEventListener(<span class="s">"click"</span>, () =&gt; {
-    <span class="f">const</span> isHidden = passwordInput.type === <span class="s">"password"</span>;
-    passwordInput.type = isHidden ? <span class="s">"text"</span> : <span class="s">"password"</span>;
-    togglePass.textContent = isHidden ? <span class="s">"🙈"</span> : <span class="s">"👁"</span>;
-});</code></pre>
-            </div>
-
-            <h3 class="sub-title">2.5 จัดการ Session อย่างถูกวิธี</h3>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ที่เก็บ</th>
-                            <th>อยู่ได้นานแค่ไหน</th>
-                            <th>เหมาะกับ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>sessionStorage</code></td>
-                            <td>ปิดแท็บ = หาย</td>
-                            <td>บัตรผ่าน "ชั่วคราว" ของระบบนี้ ✅</td>
-                        </tr>
-                        <tr>
-                            <td><code>localStorage</code></td>
-                            <td>อยู่จนกว่าจะลบเอง</td>
-                            <td>ของที่จำข้ามครั้ง เช่น ธีม, token</td>
-                        </tr>
-                        <tr>
-                            <td>ตัวแปรใน JS</td>
-                            <td>รีเฟรชหน้า = หาย</td>
-                            <td>ค่าชั่วคราวที่ไม่ต้องเก็บ</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="tip">
-                <strong>💡 ปกติระบบ Login ควรเก็บ "token" ที่ Server ออกให้</strong>
-                แต่ถ้าขอบเขตเรียนแค่ Frontend วิธีที่ยอมรับได้คือ เก็บค่าสถานะใน <code>sessionStorage</code>
-                แบบที่โปรเจกต์ทำ และปรับให้สมบูรณ์ตามข้อ 2.6–2.8
-            </div>
-
-            <h3 class="sub-title">2.6 Route Guard ฝั่งหน้าเว็บ — กันเปิดหน้า Admin ตรง ๆ</h3>
-            <div class="code-card">
-                <div class="code-head">admin/script.js — บรรทัดแรกสุดของไฟล์ (เดิมมีแล้ว ทำให้แน่นขึ้น)</div>
-<pre><code><span class="c">// 1. ยังไม่ล็อกอิน → เด้งกลับหน้า Login</span>
-<span class="k">if</span> (sessionStorage.getItem(<span class="s">"isLoggedIn"</span>) !== <span class="s">"true"</span>) {
-    <span class="c">// จำว่าตอนแรกอยากเข้าหน้าไหน (ต่อไปจะได้กลับมาที่เดิมได้)</span>
-    sessionStorage.setItem(<span class="s">"redirectAfterLogin"</span>, location.href);
-    window.location.href = <span class="s">"../login/login.html"</span>;
-    <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">"No permission"</span>);   <span class="c">// หยุดรันโค้ดที่เหลือทันที</span>
-}</code></pre>
-            </div>
-
-            <h3 class="sub-title">2.7 Auto-logout เมื่อไม่ขยับนาน (Session Timeout)</h3>
-            <div class="code-card">
-                <div class="code-head">admin/script.js — กันคนลืมล็อกเอาต์ทิ้งเครื่อง</div>
-<pre><code><span class="c">// หมดเวลา 5 นาที → ออกจากระบบอัตโนมัติ</span>
-<span class="f">const</span> TIMEOUT = <span class="n">5</span> * <span class="n">60</span> * <span class="n">1000</span>;
-<span class="f">let</span> timer;
-
-<span class="f">function</span> resetTimer() {
-    clearTimeout(timer);
-    timer = setTimeout(logout, TIMEOUT);   <span class="c">// ไม่ขยับครบเวลา → logout</span>
 }
 
-<span class="c">// ทุกครั้งที่ผู้ใช้ขยับเมาส์/พิมพ์ → นับเวลาตั้งแต่ต้น</span>
-[<span class="s">'mousemove'</span>, <span class="s">'keydown'</span>, <span class="s">'click'</span>].forEach(evt =&gt;
-    document.addEventListener(evt, resetTimer)
-);
-resetTimer();</code></pre>
-            </div>
+<span class="c">// บันทึกข้อมูลลงไฟล์ dataTest.json</span>
+<span class="f">function</span> saveData(data) {
+    <span class="k">try</span> {
+        fs.writeFileSync(DATA_FILE, JSON.stringify(data, <span class="k">null</span>, <span class="n">2</span>), <span class="s">"utf8"</span>);
+        <span class="f">return</span> <span class="k">true</span>;
+    } <span class="k">catch</span> (err) {
+        console.error(<span class="s">"Error writing JSON file:"</span>, err);
+        <span class="f">return</span> <span class="k">false</span>;
+    }
+}
 
-            <h3 class="sub-title">2.8 Logout ที่ล้างข้อมูลครบถ้วน</h3>
-            <div class="code-card">
-                <div class="code-head">admin/script.js — ล้างทุกอย่างที่เกี่ยวข้องกับ session</div>
-<pre><code><span class="f">function</span> logout() {
-    sessionStorage.removeItem(<span class="s">"isLoggedIn"</span>);         <span class="c">// ลบบัตรผ่าน</span>
-    sessionStorage.removeItem(<span class="s">"redirectAfterLogin"</span>);  <span class="c">// ลบที่อยู่ที่จำไว้</span>
-    window.location.href = <span class="s">"../index.html"</span>;             <span class="c">// กลับหน้าแรก</span>
-}</code></pre>
-            </div>
+<span class="c">// ==================== 3. REST API ENDPOINTS ====================</span>
 
-            <!-- ============ DEMO ============ -->
-            <h3 class="sub-title">2.9 ลองเล่นจริง (Working Demo)</h3>
-            <div class="tip">
-                <strong>🎯 ลองกรอก:</strong> <code>admin</code> / <code>123</code> = เข้าสำเร็จ · กรอกผิด = แสดง error · ปุ่มสลับดูรหัสผ่าน
-                และสังเกตว่า "ปุ่มจะถูกปิดระหว่างกำลังตรวจสอบ"
-            </div>
-            <div class="demo-wrap">
-                <h4>Login Demo (Frontend)</h4>
-                <form id="demoLogin" novalidate>
-                    <div class="form-group">
-                        <label for="demoUser">ชื่อผู้ใช้</label>
-                        <input type="text" id="demoUser" placeholder="admin" autocomplete="username">
-                    </div>
-                    <div class="form-group">
-                        <label for="demoPass">รหัสผ่าน</label>
-                        <div class="password-wrap">
-                            <input type="password" id="demoPass" placeholder="••••" autocomplete="current-password">
-                            <button type="button" id="toggleDemoPass">👁</button>
-                        </div>
-                    </div>
-                    <p class="demo-error" id="demoError" hidden></p>
-                    <button type="submit" id="demoSubmit" class="demo-submit">เข้าสู่ระบบ</button>
-                    <p class="demo-success" id="demoSuccess" hidden>✅ เข้าสู่ระบบสำเร็จ! (จำลอง)</p>
-                </form>
-            </div>
+<span class="c">/**
+ * @route   GET /api/residents
+ * @desc    ดึงรายชื่อและข้อมูลลูกบ้านทั้งหมด
+ */</span>
+app.get(<span class="s">"/api/residents"</span>, (req, res) =&gt; {
+    <span class="f">const</span> residents = readData();
+    res.status(<span class="n">200</span>).json({
+        success: <span class="k">true</span>,
+        count: residents.length,
+        data: residents
+    });
+});
 
-            <h3 class="sub-title">2.10 Checklist ฝั่ง Frontend</h3>
-            <div class="check-grid">
-                <div class="check-item"><input type="checkbox" disabled checked> มี Validation ก่อนส่ง (กรอกครบ + รูปแบบถูก)</div>
-                <div class="check-item"><input type="checkbox" disabled checked> มีสถานะ Loading (ปิดปุ่ม + เปลี่ยนข้อความ)</div>
-                <div class="check-item"><input type="checkbox" disabled checked> แสดง Error แบบอ่านเข้าใจง่าย (ภาษาไทย)</div>
-                <div class="check-item"><input type="checkbox" disabled checked> มีปุ่มสลับดูรหัสผ่าน + autocomplete ถูกต้อง</div>
-                <div class="check-item"><input type="checkbox" disabled checked> เก็บ session แบบชั่วคราว (sessionStorage)</div>
-                <div class="check-item"><input type="checkbox" disabled checked> Route Guard ป้องกันหน้า Admin เปิดตรง ๆ</div>
-                <div class="check-item"><input type="checkbox" disabled checked> Auto-logout เมื่อไม่ขยับนาน</div>
-                <div class="check-item"><input type="checkbox" disabled checked> Logout ล้างข้อมูล session ครบถ้วน</div>
-            </div>
+<span class="c">/**
+ * @route   GET /api/residents/:id
+ * @desc    ดึงข้อมูลลูกบ้านรายคนตาม ID
+ */</span>
+app.get(<span class="s">"/api/residents/:id"</span>, (req, res) =&gt; {
+    <span class="f">const</span> residents = readData();
+    <span class="f">const</span> resident = residents.find(u =&gt; u.id === <span class="f">Number</span>(req.params.id));
 
-        </section>
-
-        <!-- ==================== PART 3 ==================== -->
-        <section class="section" id="part3">
-            <h2 class="section-title part-label"><span>3</span> PART 3: การออกแบบและสร้าง Admin System (Admin System Architecture)</h2>
-
-            <h3 class="sub-title">3.1 โครงสร้างสถาปัตยกรรมระบบ Admin (System Architecture)</h3>
-            <div class="tip">
-                <strong>💡 หลักคิดระบบ Admin:</strong> ระบบผู้ดูแลระบบที่มีประสิทธิภาพต้องเป็น <strong>Single Page Application (SPA)</strong>
-                คือผู้ใช้เปลี่ยนหน้า (Home / Vehicle / User Data) โดยไม่ต้องโหลดเว็บใหม่ ทำให้การใช้งานลื่นไหล ไม่กระตุก
-            </div>
-
-            <h3 class="sub-title">3.2 ระบบ Routing สลับหน้าจอ (SPA Navigation)</h3>
-            <div class="code-card">
-                <div class="code-head">admin/script.js — สลับหน้าจอโดยการเปลี่ยน class 'active'</div>
-<pre><code><span class="f">function</span> showPage(target, params) {
-    <span class="c">// 1. ซ่อนทุกหน้า และเอาไฮไลต์เมนูกลับเป็นปกติก่อน</span>
-    document.querySelectorAll(<span class="s">'.page'</span>).forEach(page =&gt; page.classList.remove(<span class="s">'active'</span>));
-    document.querySelectorAll(<span class="s">'nav li'</span>).forEach(li =&gt; li.classList.remove(<span class="s">'user-select'</span>));
-
-    <span class="c">// 2. แสดงเฉพาะหน้าเป้าหมาย</span>
-    <span class="f">const</span> targetPage = document.querySelector(<span class="s">`#page-${target}`</span>);
-    <span class="k">if</span> (targetPage) {
-        targetPage.classList.add(<span class="s">'active'</span>);
-        renderUserPage(target, params); <span class="c">// เรียกฟังก์ชันวาดข้อมูลของหน้านั้น</span>
+    <span class="k">if</span> (!resident) {
+        <span class="f">return</span> res.status(<span class="n">404</span>).json({
+            success: <span class="k">false</span>,
+            message: <span class="s">`ไม่พบข้อมูลลูกบ้านรหัส ID ${req.params.id}`</span>
+        });
     }
 
-    <span class="c">// 3. ไฮไลต์เมนูที่เลือก</span>
-    <span class="f">const</span> activeLi = document.querySelector(<span class="s">`nav li[data-target="${target}"]`</span>);
-    <span class="k">if</span> (activeLi) activeLi.classList.add(<span class="s">'user-select'</span>);
-}</code></pre>
-            </div>
+    res.status(<span class="n">200</span>).json({ success: <span class="k">true</span>, data: resident });
+});
 
-            <h3 class="sub-title">3.3 การดึงและวนลูปแสดงข้อมูลแบบ Nested Data (Relational Rendering)</h3>
-            <div class="code-card">
-                <div class="code-head">admin/script.js — แตกรายการเข้า-ออกของยานพาหนะทุกคัน (Nested Loops)</div>
-<pre><code><span class="f">function</span> renderVehicleList(users) {
-    <span class="f">const</span> container = document.querySelector(<span class="s">'#VehicleData'</span>);
-    <span class="f">let</span> html = <span class="s">""</span>;
+<span class="c">/**
+ * @route   GET /api/vehicles
+ * @desc    ดึงรายการประวัติการเข้า-ออกของยานพาหนะทุกคัน
+ */</span>
+app.get(<span class="s">"/api/vehicles"</span>, (req, res) =&gt; {
+    <span class="f">const</span> residents = readData();
+    <span class="f">let</span> vehicleLogs = [];
 
-    users.forEach(user =&gt; {
-        <span class="k">if</span> (user.vehicles &amp;&amp; user.vehicles.length &gt; <span class="n">0</span>) {
-            user.vehicles.forEach(vehicle =&gt; {
-                <span class="c">// วนลูปอ่านประวัติการเข้า-ออกย่อยทุกรอบ</span>
-                <span class="k">if</span> (vehicle.timeInOut &amp;&amp; vehicle.timeInOut.length &gt; <span class="n">0</span>) {
-                    vehicle.timeInOut.forEach(record =&gt; {
-                        html += <span class="s">`
-                        &lt;div class="User VehicleRow"&gt;
-                            &lt;h2&gt;${vehicle.type}&lt;/h2&gt;
-                            &lt;h2&gt;${vehicle.plate}&lt;/h2&gt;
-                            &lt;h2&gt;in ${record.in} out ${record.out}&lt;/h2&gt;
-                        &lt;/div&gt;`</span>;
-                    });
-                }
+    residents.forEach(r =&gt; {
+        <span class="k">if</span> (r.vehicles &amp;&amp; Array.isArray(r.vehicles)) {
+            r.vehicles.forEach(v =&gt; {
+                vehicleLogs.push({
+                    residentId: r.id,
+                    houseNumber: r.houseNumber,
+                    ownerName: r.ownerName,
+                    plate: v.plate,
+                    type: v.type,
+                    timeInOut: v.timeInOut || []
+                });
             });
         }
     });
-    container.innerHTML = html;
-}</code></pre>
+
+    res.status(<span class="n">200</span>).json({
+        success: <span class="k">true</span>,
+        totalVehicles: vehicleLogs.length,
+        data: vehicleLogs
+    });
+});
+
+<span class="c">/**
+ * @route   POST /api/residents
+ * @desc    เพิ่มข้อมูลลูกบ้านคนใหม่
+ */</span>
+app.post(<span class="s">"/api/residents"</span>, (req, res) =&gt; {
+    <span class="f">const</span> { houseNumber, ownerName, role } = req.body;
+
+    <span class="k">if</span> (!houseNumber || !ownerName) {
+        <span class="f">return</span> res.status(<span class="n">400</span>).json({
+            success: <span class="k">false</span>,
+            message: <span class="s">"กรุณากรอก houseNumber และ ownerName ให้ครบถ้วน"</span>
+        });
+    }
+
+    <span class="f">const</span> residents = readData();
+    <span class="f">const</span> newId = residents.length &gt; <span class="n">0</span> ? Math.max(...residents.map(r =&gt; r.id)) + <span class="n">1</span> : <span class="n">1</span>;
+
+    <span class="f">const</span> newResident = {
+        id: newId,
+        houseNumber,
+        ownerName,
+        role: role || <span class="s">"resident"</span>,
+        regitter: <span class="k">new</span> <span class="f">Date</span>().toLocaleDateString(<span class="s">"th-TH"</span>),
+        dateMember: <span class="k">new</span> <span class="f">Date</span>().toLocaleDateString(<span class="s">"th-TH"</span>),
+        MemberTimeout: <span class="s">"31/12/2026"</span>,
+        vehicles: []
+    };
+
+    residents.push(newResident);
+    <span class="f">if</span> (saveData(residents)) {
+        res.status(<span class="n">201</span>).json({ success: <span class="k">true</span>, message: <span class="s">"เพิ่มลูกบ้านสำเร็จ"</span>, data: newResident });
+    } <span class="k">else</span> {
+        res.status(<span class="n">500</span>).json({ success: <span class="k">false</span>, message: <span class="s">"ไม่สามารถบันทึกข้อมูลได้"</span> });
+    }
+});
+
+<span class="c">/**
+ * @route   POST /api/login
+ * @desc    ระบบเข้าสู่ระบบและออก Token ชั่วคราว
+ */</span>
+app.post(<span class="s">"/api/login"</span>, (req, res) =&gt; {
+    <span class="f">const</span> { username, password } = req.body;
+    <span class="f">const</span> residents = readData();
+
+    <span class="f">const</span> user = residents.find(u =&gt; u.username === username &amp;&amp; u.password === password);
+
+    <span class="k">if</span> (user || (username === <span class="s">"admin"</span> &amp;&amp; password === <span class="s">"123"</span>)) {
+        res.status(<span class="n">200</span>).json({
+            success: <span class="k">true</span>,
+            message: <span class="s">"เข้าสู่ระบบสำเร็จ"</span>,
+            token: <span class="s">"bearer-vcces-mock-token-xyz123"</span>,
+            user: user ? { id: user.id, houseNumber: user.houseNumber, ownerName: user.ownerName, role: user.role } : { ownerName: <span class="s">"ผู้ดูแลระบบ"</span>, role: <span class="s">"admin"</span> }
+        });
+    } <span class="k">else</span> {
+        res.status(<span class="n">401</span>).json({ success: <span class="k">false</span>, message: <span class="s">"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"</span> });
+    }
+});
+
+<span class="c">// ==================== 4. 404 &amp; GLOBAL ERROR HANDLER ====================</span>
+<span class="c">// ดักจับ Route ที่ไม่มีอยู่จริง</span>
+app.use((req, res) =&gt; {
+    res.status(<span class="n">404</span>).json({ success: <span class="k">false</span>, message: <span class="s">"Endpoint Not Found"</span> });
+});
+
+<span class="c">// ดักจับ Internal Server Error ทั่วไป</span>
+app.use((err, req, res, next) =&gt; {
+    console.error(err.stack);
+    res.status(<span class="n">500</span>).json({ success: <span class="k">false</span>, message: <span class="s">"Internal Server Error"</span> });
+});
+
+<span class="c">// เปิดรันเซิร์ฟเวอร์</span>
+app.listen(PORT, () =&gt; {
+    console.log(<span class="s">`==================================================`</span>);
+    console.log(<span class="s">`🚀 Express API Server is running on port ${PORT}`</span>);
+    console.log(<span class="s">`🔗 URL: http://localhost:${PORT}/api/residents`</span>);
+    console.log(<span class="s">`==================================================`</span>);
+});</code></pre>
             </div>
 
-            <h3 class="sub-title">3.4 การเตรียมความพร้อมรองรับ CRUD กับ Backend ในอนาคต</h3>
+            <h3 class="sub-title">1.4 สรุป HTTP Status Codes ที่ต้องรู้สำหรับการสร้าง API</h3>
             <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
-                            <th>การทำงาน (CRUD)</th>
-                            <th>HTTP Method</th>
-                            <th>หน้าที่ในฝั่ง Frontend Admin</th>
+                            <th>Status Code</th>
+                            <th>ประเภท / ความหมาย</th>
+                            <th>สถานการณ์ที่ใช้ใน Express Server</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>Create</strong> (สร้าง)</td>
-                            <td><code>POST</code></td>
-                            <td>ส่งข้อมูลยานพาหนะ / ลูกบ้านใหม่ ไปบันทึกในระบบ</td>
+                            <td><code>200 OK</code></td>
+                            <td>สำเร็จ (Success)</td>
+                            <td>ดึงข้อมูล <code>GET</code> หรือค้นหาข้อมูลเจอสำเร็จ</td>
                         </tr>
                         <tr>
-                            <td><strong>Read</strong> (อ่าน)</td>
-                            <td><code>GET</code></td>
-                            <td>ดึงรายการลูกบ้าน และเวลาเข้า-ออกรถยนต์มาแสดง</td>
+                            <td><code>201 Created</code></td>
+                            <td>สร้างสำเร็จ (Created)</td>
+                            <td>บันทึกเพิ่มข้อมูลลูกบ้านคนใหม่สำเร็จด้วย <code>POST</code></td>
                         </tr>
                         <tr>
-                            <td><strong>Update</strong> (แก้ไข)</td>
-                            <td><code>PUT / PATCH</code></td>
-                            <td>อัปเดตข้อมูลบ้านเลขที่ ป้ายทะเบียน หรือสถานะสมาชิก</td>
+                            <td><code>400 Bad Request</code></td>
+                            <td>คำขอไม่ถูกต้อง</td>
+                            <td>ผู้ใช้ลืมกรอกข้อมูลที่จำเป็นมาใน Body (req.body)</td>
                         </tr>
                         <tr>
-                            <td><strong>Delete</strong> (ลบ)</td>
-                            <td><code>DELETE</code></td>
-                            <td>ยกเลิกข้อมูลลูกบ้าน หรือลบป้ายทะเบียนออกจากระบบ</td>
+                            <td><code>401 Unauthorized</code></td>
+                            <td>ไม่ผ่านการรับรองสิทธิ์</td>
+                            <td>กรอก Username/Password ล็อกอินไม่ถูกต้อง</td>
+                        </tr>
+                        <tr>
+                            <td><code>404 Not Found</code></td>
+                            <td>ไม่พบทรัพยากร</td>
+                            <td>ค้นหา ID ลูกบ้านไม่พบ หรือกรอก URL API ผิด</td>
+                        </tr>
+                        <tr>
+                            <td><code>500 Internal Error</code></td>
+                            <td>เซิร์ฟเวอร์ผิดพลาด</td>
+                            <td>เกิดข้อผิดพลาดในการอ่านไฟล์ <code>dataTest.json</code> หรือโค้ดพัง</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
+            <h3 class="sub-title">1.5 ทดสอบและจำลองการเรียกใช้งาน Express API (Live API Tester)</h3>
+            <div class="tip">
+                <strong>🎯 ลองกดปุ่มทดสอบด้านล่าง:</strong> เพื่อจำลองการส่งคำขอไปยัง Express API Endpoints ต่าง ๆ และสังเกตผลลัพธ์ JSON Response + HTTP Status Code
+            </div>
+            <div class="demo-wrap" style="max-width: 100%;">
+                <h4>🧪 Express API Interactive Tester Demo</h4>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+                    <button type="button" class="demo-submit" style="width: auto; flex: 1;" onclick="testApiEndpoint('residents')">GET /api/residents (200)</button>
+                    <button type="button" class="demo-submit" style="width: auto; flex: 1; background: var(--color-secondary);" onclick="testApiEndpoint('resident1')">GET /api/residents/1 (200)</button>
+                    <button type="button" class="demo-submit" style="width: auto; flex: 1; background: var(--color-green);" onclick="testApiEndpoint('vehicles')">GET /api/vehicles (200)</button>
+                    <button type="button" class="demo-submit" style="width: auto; flex: 1; background: var(--color-red);" onclick="testApiEndpoint('notfound')">GET /api/residents/99 (404)</button>
+                </div>
+                <div class="code-card" style="margin-bottom: 0;">
+                    <div class="code-head" id="apiTestUrl">URL Endpoint: (เลือกรันคำสั่ง API ด้านบน)</div>
+                    <pre><code id="apiTestOutput">// กดปุ่มด้านบนเพื่อจำลองการส่ง fetch() Request และแสดงผล Response JSON</code></pre>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ==================== PART 2: API DOCUMENTATION & CONTRACT SPECIFICATION ==================== -->
+        <section class="section" id="part2">
+            <h2 class="section-title part-label"><span>2</span> API Documentation Specification (เอกสารข้อตกลงและมาตรฐาน API)</h2>
+
+            <div class="tip" style="background: #eef3fb; border-left-color: var(--color-primary); color: var(--color-primary);">
+                <strong>📄 วัตถุประสงค์ของเอกสารนี้:</strong> ใช้สำหรับส่งต่อให้โปรแกรมเมอร์ฝั่ง <strong>Backend / Node.js Express</strong> เพื่อเป็น <strong>API Contract</strong> ข้อตกลงมาตรฐานโครงสร้าง Response และ HTTP Endpoints ให้ส่งข้อมูลกลับมาตรงกับที่ฝั่ง Frontend ของเราออกแบบไว้
+            </div>
+
+            <h3 class="sub-title">2.1 มาตรฐานโครงสร้างข้อมูลตอบกลับ (Standard Response Structure)</h3>
+            <p style="margin-bottom: 10px;">กำหนดให้ทุก Endpoint ตอบกลับในรูปแบบ JSON Object ที่มี Key หลักดังนี้เสมอ:</p>
+            <div class="code-card">
+                <div class="code-head">JSON — Standard Success &amp; Error Response Format</div>
+<pre><code><span class="c">// 1. กรณีทำงานสำเร็จ (Success Response)</span>
+{
+  <span class="s">"success"</span>: <span class="k">true</span>,
+  <span class="s">"message"</span>: <span class="s">"ข้อความอธิบายผลลัพธ์ (Optional)"</span>,
+  <span class="s">"count"</span>: <span class="n">3</span>,             <span class="c">// จำนวนรายการ (ถ้าเป็น Array)</span>
+  <span class="s">"data"</span>: [ ... ]         <span class="c">// ข้อมูลผลลัพธ์ (Object หรือ Array)</span>
+}
+
+<span class="c">// 2. กรณีเกิดข้อผิดพลาด (Error Response)</span>
+{
+  <span class="s">"success"</span>: <span class="k">false</span>,
+  <span class="s">"message"</span>: <span class="s">"สาเหตุของข้อผิดพลาด เช่น ไม่พบข้อมูล หรือรหัสผ่านไม่ถูกต้อง"</span>,
+  <span class="s">"errorCode"</span>: <span class="s">"RESIDENT_NOT_FOUND"</span> <span class="c">// รหัสอ้างอิง error (Optional)</span>
+}</code></pre>
+            </div>
+
+            <h3 class="sub-title">2.2 รายละเอียด API Endpoints ทั้งหมด (API Reference Specification)</h3>
+            
+            <!-- Endpoint 1 -->
+            <div class="compare-col new" style="margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                    <h4 style="margin:0;"><span class="toc-num" style="background:var(--color-green);">GET</span> /api/residents</h4>
+                    <span style="font-size:0.85rem; color:#666;">ดึงรายชื่อและข้อมูลลูกบ้านทั้งหมด</span>
+                </div>
+                <hr style="margin: 10px 0; border: none; border-top: 1px solid #e5e7eb;">
+                <p><strong>Description:</strong> ส่งคืนข้อมูลลูกบ้าน รายละเอียดบ้านเลขที่ ทะเบียนรถ และประวัติเข้า-ออกทั้งหมด</p>
+                <p><strong>Headers Required:</strong> <code>Content-Type: application/json</code></p>
+                <p><strong>Success Response Example (200 OK):</strong></p>
+                <div class="code-card" style="margin-top:8px;">
+<pre><code>{
+  <span class="s">"success"</span>: <span class="k">true</span>,
+  <span class="s">"count"</span>: <span class="n">1</span>,
+  <span class="s">"data"</span>: [
+    {
+      <span class="s">"id"</span>: <span class="n">1</span>,
+      <span class="s">"houseNumber"</span>: <span class="s">"158/1"</span>,
+      <span class="s">"ownerName"</span>: <span class="s">"สมหมาย ดีใจ"</span>,
+      <span class="s">"role"</span>: <span class="s">"resident"</span>,
+      <span class="s">"regitter"</span>: <span class="s">"15/10/2026"</span>,
+      <span class="s">"dateMember"</span>: <span class="s">"15/10/2026"</span>,
+      <span class="s">"MemberTimeout"</span>: <span class="s">"15/11/2026"</span>,
+      <span class="s">"vehicles"</span>: [
+        {
+          <span class="s">"plate"</span>: <span class="s">"1กข1111"</span>,
+          <span class="s">"type"</span>: <span class="s">"Car"</span>,
+          <span class="s">"regitter"</span>: <span class="s">"15/10/2026"</span>,
+          <span class="s">"timeInOut"</span>: [{ <span class="s">"in"</span>: <span class="s">"15:00"</span>, <span class="s">"out"</span>: <span class="s">"19:00"</span> }]
+        }
+      ]
+    }
+  ]
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Endpoint 2 -->
+            <div class="compare-col new" style="margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                    <h4 style="margin:0;"><span class="toc-num" style="background:var(--color-green);">GET</span> /api/residents/:id</h4>
+                    <span style="font-size:0.85rem; color:#666;">ดึงข้อมูลลูกบ้านระบุตาม ID</span>
+                </div>
+                <hr style="margin: 10px 0; border: none; border-top: 1px solid #e5e7eb;">
+                <p><strong>URL Parameter:</strong> <code>id</code> (Number) เช่น <code>/api/residents/1</code></p>
+                <p><strong>Success Response (200 OK):</strong> คืนค่า Object ลูกบ้าน 1 รายการใน Key <code>data</code></p>
+                <p><strong>Error Response (404 Not Found):</strong></p>
+                <div class="code-card" style="margin-top:8px;">
+<pre><code>{
+  <span class="s">"success"</span>: <span class="k">false</span>,
+  <span class="s">"message"</span>: <span class="s">"ไม่พบข้อมูลลูกบ้านรหัส ID 99"</span>
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Endpoint 3 -->
+            <div class="compare-col new" style="margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                    <h4 style="margin:0;"><span class="toc-num" style="background:var(--color-green);">GET</span> /api/vehicles</h4>
+                    <span style="font-size:0.85rem; color:#666;">ดึงรายการประวัติการเข้า-ออกของยานพาหนะทั้งหมด</span>
+                </div>
+                <hr style="margin: 10px 0; border: none; border-top: 1px solid #e5e7eb;">
+                <p><strong>Description:</strong> ให้ Backend ทำการ Flatten แตกรายการรถยนต์และประวัติ <code>timeInOut</code> ออกมาเป็น Array เพื่อแสดงในหน้าตารางประวัติเข้า-ออกได้สะดวก</p>
+                <p><strong>Success Response Example (200 OK):</strong></p>
+                <div class="code-card" style="margin-top:8px;">
+<pre><code>{
+  <span class="s">"success"</span>: <span class="k">true</span>,
+  <span class="s">"totalVehicles"</span>: <span class="n">2</span>,
+  <span class="s">"data"</span>: [
+    {
+      <span class="s">"residentId"</span>: <span class="n">1</span>,
+      <span class="s">"houseNumber"</span>: <span class="s">"158/1"</span>,
+      <span class="s">"ownerName"</span>: <span class="s">"สมหมาย ดีใจ"</span>,
+      <span class="s">"plate"</span>: <span class="s">"1กข1111"</span>,
+      <span class="s">"type"</span>: <span class="s">"Car"</span>,
+      <span class="s">"timeInOut"</span>: [{ <span class="s">"in"</span>: <span class="s">"15:00"</span>, <span class="s">"out"</span>: <span class="s">"19:00"</span> }]
+    }
+  ]
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Endpoint 4 -->
+            <div class="compare-col new" style="margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                    <h4 style="margin:0;"><span class="toc-num" style="background:var(--color-secondary);">POST</span> /api/residents</h4>
+                    <span style="font-size:0.85rem; color:#666;">ลงทะเบียนเพิ่มลูกบ้านคนใหม่</span>
+                </div>
+                <hr style="margin: 10px 0; border: none; border-top: 1px solid #e5e7eb;">
+                <p><strong>Request Body (JSON):</strong></p>
+                <div class="code-card" style="margin-top:4px;">
+<pre><code>{
+  <span class="s">"houseNumber"</span>: <span class="s">"158/4"</span>,
+  <span class="s">"ownerName"</span>: <span class="s">"นายกิตติ มีทรัพย์"</span>,
+  <span class="s">"role"</span>: <span class="s">"resident"</span>
+}</code></pre>
+                </div>
+                <p><strong>Success Response (201 Created):</strong></p>
+                <div class="code-card" style="margin-top:4px;">
+<pre><code>{
+  <span class="s">"success"</span>: <span class="k">true</span>,
+  <span class="s">"message"</span>: <span class="s">"เพิ่มลูกบ้านสำเร็จ"</span>,
+  <span class="s">"data"</span>: { <span class="s">"id"</span>: <span class="n">4</span>, <span class="s">"houseNumber"</span>: <span class="s">"158/4"</span>, <span class="s">"ownerName"</span>: <span class="s">"นายกิตติ มีทรัพย์"</span>, ... }
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Endpoint 5 -->
+            <div class="compare-col new" style="margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                    <h4 style="margin:0;"><span class="toc-num" style="background:var(--color-secondary);">POST</span> /api/login</h4>
+                    <span style="font-size:0.85rem; color:#666;">ตรวจสอบสิทธิ์เข้าใช้งานระบบ (Authentication)</span>
+                </div>
+                <hr style="margin: 10px 0; border: none; border-top: 1px solid #e5e7eb;">
+                <p><strong>Request Body (JSON):</strong></p>
+                <div class="code-card" style="margin-top:4px;">
+<pre><code>{
+  <span class="s">"username"</span>: <span class="s">"158/2"</span>,
+  <span class="s">"password"</span>: <span class="s">"password123"</span>
+}</code></pre>
+                </div>
+                <p><strong>Success Response (200 OK):</strong></p>
+                <div class="code-card" style="margin-top:4px;">
+<pre><code>{
+  <span class="s">"success"</span>: <span class="k">true</span>,
+  <span class="s">"message"</span>: <span class="s">"เข้าสู่ระบบสำเร็จ"</span>,
+  <span class="s">"token"</span>: <span class="s">"jwt-token-string-xxxx"</span>,
+  <span class="s">"user"</span>: { <span class="s">"id"</span>: <span class="n">2</span>, <span class="s">"houseNumber"</span>: <span class="s">"158/2"</span>, <span class="s">"ownerName"</span>: <span class="s">"สมชาย ใจดี"</span>, <span class="s">"role"</span>: <span class="s">"resident"</span> }
+}</code></pre>
+                </div>
+                <p><strong>Error Response (401 Unauthorized):</strong> <code>{ "success": false, "message": "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" }</code></p>
+            </div>
+
         </section>
 
     </main>
 
     <footer class="footer">
-        <p>Study Guide (Frontend) — Mock Data → API &amp; Professional Login · IOT · RMUTL ENGCP_3</p>
+        <p>Study Guide (Frontend &amp; Express API) — Mock Data → API &amp; Professional Login · IOT · RMUTL ENGCP_3</p>
     </footer>
 
     <!-- Demo logic -->
@@ -544,6 +553,52 @@ resetTimer();</code></pre>
             demoSubmit.disabled = false;
             demoSubmit.textContent = "เข้าสู่ระบบ";
         });
+
+        // Interactive API Tester Demo Logic
+        const mockJsonData = [
+            {
+                "id": 1,
+                "houseNumber": "158/1",
+                "ownerName": "สมหมาย ดีใจ",
+                "role": "resident",
+                "regitter": "15/10/2026",
+                "vehicles": [
+                    { "plate": "1กข1111", "type": "Car", "timeInOut": [{ "in": "15:00", "out": "19:00" }] }
+                ]
+            },
+            {
+                "id": 2,
+                "houseNumber": "158/2",
+                "ownerName": "สมชาย ใจดี",
+                "role": "resident",
+                "vehicles": [
+                    { "plate": "กท 9999", "type": "Car", "timeInOut": [{ "in": "12:00", "out": "19:00" }] }
+                ]
+            }
+        ];
+
+        function testApiEndpoint(type) {
+            const urlElem = document.getElementById("apiTestUrl");
+            const outputElem = document.getElementById("apiTestOutput");
+
+            if (type === 'residents') {
+                urlElem.textContent = "HTTP GET http://localhost:3000/api/residents (Status: 200 OK)";
+                outputElem.textContent = JSON.stringify({ success: true, count: mockJsonData.length, data: mockJsonData }, null, 2);
+            } else if (type === 'resident1') {
+                urlElem.textContent = "HTTP GET http://localhost:3000/api/residents/1 (Status: 200 OK)";
+                outputElem.textContent = JSON.stringify({ success: true, data: mockJsonData[0] }, null, 2);
+            } else if (type === 'vehicles') {
+                urlElem.textContent = "HTTP GET http://localhost:3000/api/vehicles (Status: 200 OK)";
+                const vehicles = [
+                    { houseNumber: "158/1", ownerName: "สมหมาย ดีใจ", plate: "1กข1111", type: "Car", timeInOut: [{ in: "15:00", out: "19:00" }] },
+                    { houseNumber: "158/2", ownerName: "สมชาย ใจดี", plate: "กท 9999", type: "Car", timeInOut: [{ in: "12:00", out: "19:00" }] }
+                ];
+                outputElem.textContent = JSON.stringify({ success: true, totalVehicles: vehicles.length, data: vehicles }, null, 2);
+            } else if (type === 'notfound') {
+                urlElem.textContent = "HTTP GET http://localhost:3000/api/residents/99 (Status: 404 Not Found)";
+                outputElem.textContent = JSON.stringify({ success: false, message: "ไม่พบข้อมูลลูกบ้านรหัส ID 99" }, null, 2);
+            }
+        }
     </script>
 
 </body>
