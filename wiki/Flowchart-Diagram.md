@@ -18,7 +18,7 @@ flowchart TD
     K --> L([เข้าสู่ Admin Dashboard])
 
     L --> M{Fetch ข้อมูล<br/>admin/dataTest.json}
-    M -->|รอ 3 วิ (จำลอง)| N[สถานะ Loading<br/>'Loading data...']
+    M -->|"รอ 3 วิ (จำลอง)"| N[สถานะ Loading<br/>Loading data...]
     N --> O{HTTP Status 200-299?}
     O -->|ไม่| P[แสดงข้อความ Error<br/>Data loading error (Code)]
     O -->|ใช่| Q[เก็บข้อมูลลง mainData]
