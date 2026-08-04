@@ -1,0 +1,6 @@
+# Sensitive Data / Environments
+.env
+.env.local
+
+# Dependency folders
+node_modules/

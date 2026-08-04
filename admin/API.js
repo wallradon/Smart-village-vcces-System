@@ -1,10 +1,18 @@
+// API Configuration (ดึงจากตัวแปรส่วนกลางเพื่อความปลอดภัย)
+// เมื่อใช้ Build Tool เช่น Vite จะเปลี่ยนเป็น: import.meta.env.VITE_API_BASE_URL
+const CONFIG = {
+    API_BASE_URL: typeof process !== 'undefined' && process.env.API_BASE_URL ? process.env.API_BASE_URL : '/api',
+    API_KEY: typeof process !== 'undefined' && process.env.API_KEY ? process.env.API_KEY : ''
+};
+
 // POST USER
 async function createUser(userData) {
     try {
-        const response = await fetch('https://api-node-iot.onrender.com/api/users/createUser', {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/users/createUser`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-API-Key': CONFIG.API_KEY
             },
             body: JSON.stringify(userData)
         });
@@ -27,7 +35,11 @@ async function createUser(userData) {
 // GET USER
 async function getUser() {
     try {
-        const response = await fetch('https://api-node-iot.onrender.com/api/users/getUsers');
+        const response = await fetch(`${CONFIG.API_BASE_URL}/users/getUsers`, {
+            headers: {
+                'X-API-Key': CONFIG.API_KEY
+            }
+        });
 
         const result = await response.json();
 
