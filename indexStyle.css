@@ -1,38 +1,191 @@
-/* ตกแต่งส่วนเนื้อหาตรงกลางของหน้าแรกเพิ่มเติม */
 .landing-main {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: calc(100vh - 80px); /* หักความสูงของ header ออก */
+    min-height: calc(100vh - 80px);
     text-align: center;
-    background-color: var(--color-bg);
+    background: linear-gradient(rgba(255, 253, 237, 0.85), rgba(255, 253, 237, 0.85)), url('./img/BG.png') no-repeat center center / cover;
+    padding: 40px 20px;
 }
+
+/* Simple Clean Card */
+.simple-card {
+    width: 100%;
+    max-width: 650px;
+    background: var(--color-white);
+    border-radius: 20px;
+    padding: 50px 30px;
+    box-shadow: 0 10px 30px rgba(0, 46, 94, 0.12);
+    border: 1px solid #e2e8f0;
+}
+
 .landing-title {
-    font-size: 3.5rem;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
     color: var(--color-primary);
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.landing-subtitle {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--color-secondary);
+    margin-bottom: 35px;
+    font-weight: 400;
+}
+
+.action-box {
     margin-bottom: 20px;
 }
-.landing-subtitle {
-    font-size: 1.5rem;
-    color: var(--color-secondary);
-}
-/* ปุ่มเข้าสู่ระบบมุมขวาบน แบบไม่มีเส้นใต้ (ใช้เป็นแท็ก <a> เพื่อให้เปลี่ยนหน้าได้ทันที) */
-.login-btn-header {
-    background-color: transparent;
+
+.btn-login-main {
+    display: inline-block;
+    background-color: var(--color-primary);
     color: var(--color-white);
-    border: 1.5px solid rgba(255, 255, 255, 0.5);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-family: "Prompt", sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 16px 40px;
+    border-radius: 30px;
+    border: none;
     cursor: pointer;
+    font-family: "Prompt", sans-serif;
     transition: all 0.3s ease;
-    text-decoration: none; /* เอาขีดเส้นใต้ออก */
-    outline: none;
+    box-shadow: 0 6px 18px rgba(0, 46, 94, 0.25);
 }
-.login-btn-header:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* เรืองแสงเป็นสีขาวจางๆ ให้ดูหรูหรา */
-    border-color: var(--color-white);
+
+.btn-login-main:hover {
+    background-color: var(--color-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 46, 94, 0.35);
+}
+
+.quick-info {
+    font-size: 0.95rem;
+    color: #64748b;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 20px;
+}
+
+/* Modal Pop-up Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-card {
+    background: var(--color-white);
+    width: 100%;
+    max-width: 520px;
+    border-radius: 24px;
+    padding: 35px 25px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-card {
+    transform: translateY(0);
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    font-size: 1.8rem;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+    color: #1e293b;
+}
+
+.modal-card h3 {
+    font-size: 1.4rem;
+    color: var(--color-primary);
+    margin-bottom: 6px;
+}
+
+.modal-sub {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 25px;
+}
+
+.modal-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.role-option {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: 2px solid #e2e8f0;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.role-icon {
+    font-size: 2.2rem;
+    background: var(--color-bg);
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.role-text {
+    text-align: left;
+}
+
+.role-text h4 {
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    margin-bottom: 2px;
+}
+
+.role-text span {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.resident-option:hover {
+    border-color: #2b9348;
+    background: #f0fff4;
+    transform: translateX(4px);
+}
+
+.admin-option:hover {
+    border-color: var(--color-primary);
+    background: #f0f7ff;
+    transform: translateX(4px);
 }

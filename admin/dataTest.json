@@ -3,15 +3,13 @@
     "id": 1,
     "houseNumber": "158/1",
     "ownerName": "สมหมาย ดีใจ",
-    "username": "158/1",
-    "password": "password123",
     "role": "resident",
     "regitter": "15/10/2026",
     "dateMember": "15/10/2026",
     "MemberTimeout": "15/11/2026",
     "vehicles": [
       {
-        "plate": "1กข 1111",
+        "plate": "1กข1111",
         "type": "Car",
         "regitter": "15/10/2026",
         "timeInOut": [

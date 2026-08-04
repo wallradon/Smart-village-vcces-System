@@ -13,20 +13,76 @@
     <header>
         <img src="admin/placeholder-300x300.png" alt="Logo">
         <h1 class="head-content">ระบบจัดการข้อมูลลูกบ้าน</h1>
-        
-        <!-- ปุ่มเข้าสู่ระบบเชื่อมไปยังหน้า login.html -->
-        <a href="login/login.html" class="login-btn-header">เข้าสู่ระบบ (Login)</a>
     </header>
 
     <main class="landing-main">
-        <h2 class="landing-title">ยินดีต้อนรับสู่ Smart Village</h2>
-        <p class="landing-subtitle">ระบบจัดการหมู่บ้านอัจฉริยะ VCCES</p>
+        <div class="simple-card">
+            <h2 class="landing-title">ยินดีต้อนรับสู่ Smart Village</h2>
+            <p class="landing-subtitle">ระบบบริการและจัดการหมู่บ้านอัจฉริยะ VCCES</p>
+            
+            <div class="action-box">
+                <button id="openModalBtn" class="btn-login-main">
+                    🔑 เข้าสู่ระบบใช้งาน (Login)
+                </button>
+            </div>
+            <p class="quick-info">💡 กดปุ่มเพื่อเลือกประเภทผู้ใช้งานก่อนเข้าสู่ระบบ</p>
+        </div>
     </main>
 
-    <!-- Smart Router: ถ้าตรวจพบว่าเคยล็อกอินไว้แล้ว จะดีดไปหน้า Admin ให้อัตโนมัติ -->
+    <!-- Modal Pop-up สำหรับเลือกว่าเป็น ลูกบ้าน หรือ นิติบุคคล -->
+    <div id="roleModal" class="modal-overlay">
+        <div class="modal-card">
+            <button id="closeModalBtn" class="modal-close">&times;</button>
+            <h3>กรุณาเลือกประเภทผู้ใช้งาน</h3>
+            <p class="modal-sub">เลือกสถานะการใช้งานของคุณเพื่อไปยังหน้าเข้าสู่ระบบ</p>
+
+            <div class="modal-grid">
+                <!-- ตัวเลือกสำหรับลูกบ้าน -->
+                <a href="login/login.html?role=resident" class="role-option resident-option">
+                    <div class="role-icon">🏡</div>
+                    <div class="role-text">
+                        <h4>ลูกบ้าน (Resident)</h4>
+                        <span>ตรวจสอบยานพาหนะและแจ้งเรื่อง</span>
+                    </div>
+                </a>
+
+                <!-- ตัวเลือกสำหรับนิติบุคคล -->
+                <a href="login/login.html?role=admin" class="role-option admin-option">
+                    <div class="role-icon">🏢</div>
+                    <div class="role-text">
+                        <h4>นิติบุคคล (Juristic)</h4>
+                        <span>ระบบจัดการข้อมูลและกล้อง LPR</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Smart Router & Modal Logic -->
     <script>
         if (sessionStorage.getItem("isLoggedIn") === "true") {
             window.location.href = "admin/admin.html";
+        }
+
+        // Modal Pop-up Control
+        const openModalBtn = document.getElementById("openModalBtn");
+        const closeModalBtn = document.getElementById("closeModalBtn");
+        const roleModal = document.getElementById("roleModal");
+
+        if (openModalBtn && closeModalBtn && roleModal) {
+            openModalBtn.addEventListener("click", () => {
+                roleModal.classList.add("active");
+            });
+
+            closeModalBtn.addEventListener("click", () => {
+                roleModal.classList.remove("active");
+            });
+
+            roleModal.addEventListener("click", (e) => {
+                if (e.target === roleModal) {
+                    roleModal.classList.remove("active");
+                }
+            });
         }
     </script>
 </body>

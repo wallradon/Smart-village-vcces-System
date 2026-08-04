@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300&family=Pridi:wght@200;300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300&family=Pridi&family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 :root{
-    --color-primary: #002e5e;      
+    --color-primary: #161E54;      
     --color-secondary: #29356c;   
     --color-bg: #fffded;          
     --color-white: #ffffff;
@@ -81,11 +81,13 @@ header{
                  font-size: 20px;
                  font-weight: 500;
                  padding: 20px;
+                 border-radius: 24px;
             }
             .user-select{
                 background-color: var(--color-primary);
                 color: var(--color-white);
                 border:solid 2px  var(--color-white);
+                border-radius: 24px;
             }
         }
     }
@@ -98,9 +100,10 @@ header{
             display: grid;
             grid-template-columns: 8rem 8rem 1fr;
             align-items: center ;
-            background-color: var(--color-primary);
+            background-color: var(--color-secondary);
+            border-radius: 24px;
             margin: 10px;
-            padding: 10px 20px;
+            padding: 20px 30px;
             min-width: 930px;
             h2{
                 color: var(--color-white);
@@ -119,6 +122,10 @@ header{
                 padding: 16px;
                 margin-right: 10px;
             }
+        }
+        .headUserData{
+            z-index: 1;
+            background-color: var(--color-primary);
         }
         .VehicleRow, .headVehicleData {
             grid-template-columns: 10rem 1fr 1fr !important;
@@ -153,6 +160,7 @@ header{
         }
         .loading-text{
             color: var(--color-primary);
+            
             text-align: center;
             font-size: 18px;
             padding: 20px;
