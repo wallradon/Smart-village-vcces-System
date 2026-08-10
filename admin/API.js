@@ -1,22 +1,29 @@
 // API URL Configuration
-// ดึงค่า URL หลักมาจาก config.js
+// ดึงค่า URL หลักสำหรับการเชื่อมต่อ API มาจากตัวแปร CONFIG ใน config.js
 const API_BASE_URL = CONFIG.API_BASE_URL;
 
-// POST USER
+/**
+ * ฟังก์ชันสำหรับสร้างข้อมูลลูกบ้านใหม่ (POST Request)
+ * @param {Object} userData - ข้อมูลผู้ใช้งานที่ต้องการบันทึกเข้าระบบ
+ * @returns {Promise<Object>} ข้อมูลผลลัพธ์ตอบกลับจากเซิร์ฟเวอร์
+ */
 async function createUser(userData) {
     try {
-        const response = await fetch(`${API_BASE_URL}/users/createUser`, {
+        // ส่งคำร้อง HTTP POST Request ไปยัง API_BASE_URL
+        const response = await fetch(`${API_BASE_URL}&field1=123`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(userData)
+            body: JSON.stringify(userData) // แปลงข้อมูล JavaScript Object เป็น JSON String
         });
 
+        // ดึงผลลัพธ์การตอบกลับในรูปแบบ JSON
         const result = await response.json();
 
+        // ตรวจสอบว่าการร้องขอสำเร็จหรือไม่ (HTTP Status อยู่ในช่วง 200-299)
         if (!response.ok) {
-            // เช่น 400, 409 จาก backend
+            // หากเกิดข้อผิดพลาด เช่น รหัสสถานะ 400 หรือ 409 ให้โยนข้อผิดพลาดพร้อมข้อความที่ได้รับ
             throw new Error(result.message || 'เกิดข้อผิดพลาดในการสร้างผู้ใช้งาน');
         }
 
@@ -25,59 +32,54 @@ async function createUser(userData) {
 
     } catch (error) {
         console.error('createUser error:', error.message);
-        throw error; // ให้ส่วนที่เรียกใช้ไปจัดการ error ต่อ (เช่น แสดง alert)
+        throw error; // ส่งต่อ Error ให้ฝั่ง UI ไปจัดการต่อ (เช่น แสดง alert)
     }
 }
 
-// GET USER
-async function getUser() {
+// ตัวแปรสำหรับเก็บ HTTP status จากการ fetch ข้อมูลรอบล่าสุด (0 = ยังไม่เคยลองดึงข้อมูล)
+let fetchStatus = 0;     
+
+/**
+ * ฟังก์ชันดึงข้อมูลผู้ใช้ทั้งหมดจากไฟล์ JSON หรือ API (GET Request)
+ * @param {string} path - URL หรือ Path ของไฟล์ข้อมูล (เช่น './dataTest.json')
+ */
+async function getUser(path) {
     try {
-        const response = await fetch(`${API_BASE_URL}/users/getUsers`);
+        // จำลองการหน่วงเวลา 3 วินาที (3000ms) เพื่อทดสอบสถานะการโหลด (Loading state) ในระหว่างการพัฒนา
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
-        const result = await response.json();
-
-        if (!response.ok) {
-            // เช่น 400, 409 จาก backend
-            throw new Error(result.message || 'เกิดข้อผิดพลาดในการสร้างผู้ใช้งาน');
-        }
-
-        console.table(result);
-        return result;
-
-    } catch (error) {
-        console.error('getUser error:', error.message);
-        throw error; // ให้ส่วนที่เรียกใช้ไปจัดการ error ต่อ (เช่น แสดง alert)
-    }
-}
-
-async function testData() {
-    const userData = {
-        houseNumber: "1",
-        ownerName: "1",
-        username: "ๅๅๅ",
-        password: "1",
-        role: "USER",
-        registerDate: "99/2/99",
-        memberStartDate: "88/3/88",
-        memberExpireDate: "77/3/77"
-    };
-    try {
-        const post = await createUser(userData);
-        console.log("post", post);
+        // ส่งคำร้อง GET Request ไปยังปลายทาง
+        const res = await fetch(path);
         
-    } catch (error) {
-        console.log(error.message);
+        // อัปเดตรหัสสถานะการตอบรับ (เช่น 200, 404, 500)
+        fetchStatus = res.status;
+        
+        // หาก HTTP status ไม่ผ่านเกณฑ์สำเร็จ ให้ข้ามไปทำงานในบล็อก catch
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+
+        // แปลงข้อมูลที่ดึงได้ให้อยู่ในรูปของ JSON
+        const data = await res.json();
+        
+        // บันทึกข้อมูลลงใน mainData (Global State)
+        mainData = data;
+        
+        // ตั้งค่าสถานะการโหลดเป็น false (โหลดเสร็จสิ้น)
+        isLoading = false;
+        
+        // รีเฟรชข้อมูลในหน้าเพจที่กำลังแสดงอยู่ในปัจจุบันเพื่ออัปเดต UI ทันที
+        refreshCurrentPage(); 
+    } catch (err) {
+        console.log("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
+        
+        // สิ้นสุดการโหลดข้อมูลแม้ว่าจะเกิดข้อผิดพลาดก็ตาม
+        isLoading = false;
+        
+        // หาก fetchStatus เป็น 0 แสดงว่าส่งคำขอไม่ถึงปลายทางเลย (เช่น ขัดข้องที่อินเทอร์เน็ต)
+        // ให้กำหนดรหัสผิดพลาดเป็น 500 เพื่อนำไปแสดงผลบน UI (Error State)
+        if (fetchStatus === 0) fetchStatus = 500;
+        
+        // อัปเดตหน้าเพจปัจจุบันให้แสดงข้อความแจ้งเตือนข้อผิดพลาด
+        refreshCurrentPage();
     }
 }
 
-async function testDB() {
-    await testData();
-    await getUser();
-}
-
-const BTN = document.querySelector(".PBTN");
-if (BTN) {
-    BTN.addEventListener("click", (e) => {
-        testDB();
-    });
-}

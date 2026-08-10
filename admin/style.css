@@ -1,41 +1,53 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300&family=Pridi:wght@200;300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300&family=Pridi&family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-:root{
-    --color-primary: #161E54;      
-    --color-secondary: #29356c;   
-    --color-bg: #fffded;          
+
+:root {
+    --color-primary: #161E54;
+    --color-secondary: #29356c;
+    --color-bg: #fffded;
     --color-white: #ffffff;
     --color-border: rgb(192, 192, 192);
 }
 
-body{
+body {
     margin: 0;
     padding: 0;
     background-color: var(--color-bg);
     font-family: "Prompt", serif;
 }
-h1, h2, h3, h4, h5, h6, p {
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
     margin: 0;
 }
-.page{
+
+.page {
     display: none;
 }
-.page.active{
-        display: block;
+
+.page.active {
+    display: block;
 }
 
 
-header{
+header {
     box-sizing: border-box;
-    display: flex;    
+    display: flex;
     align-items: center;
     background-color: var(--color-primary);
     padding: 20px;
     height: 80px;
-    img{
+
+    img {
         position: relative;
         width: 4.375rem;
-    } 
+    }
+
     .logout-btn-header {
         background-color: transparent;
         color: var(--color-white);
@@ -49,6 +61,7 @@ header{
         transition: all 0.3s ease;
         outline: none;
     }
+
     .logout-btn-header:hover {
         background-color: #e74c3c;
         border-color: #e74c3c;
@@ -56,60 +69,70 @@ header{
     }
 }
 
-.head-content{
+.head-content {
     flex: 1;
     text-align: center;
     margin: 0;
     color: var(--color-white);
 }
+
 /* ----------------------main---------------------------- */
-.main-content{
+.main-content {
     display: grid;
     grid-template-columns: 18.75rem 1fr;
     min-height: calc(100vh - 80px);
-    nav{
-        
+
+    nav {
+
         background-color: var(--color-secondary);
-        ul{
+
+        ul {
             padding: 0;
-            li{
-                 background-color: var(--color-white);
-                 color: var(--color-primary);
-                 text-align: center;
-                 list-style-type:none ;
-                 margin: 10px 5px;
-                 font-size: 20px;
-                 font-weight: 500;
-                 padding: 20px;
-                 border-radius: 24px;
+
+            li {
+                background-color: var(--color-white);
+                color: var(--color-primary);
+                text-align: center;
+                list-style-type: none;
+                margin: 10px 5px;
+                font-size: 20px;
+                font-weight: 500;
+                padding: 20px;
+                border-radius: 24px;
             }
-            .user-select{
+
+            .user-select {
                 background-color: var(--color-primary);
                 color: var(--color-white);
-                border:solid 2px  var(--color-white);
+                border: solid 2px var(--color-white);
                 border-radius: 24px;
             }
         }
     }
+
     /* --------------------user-------------------   */
-    .user-details.active{
+    .user-details.active {
         display: flex;
         flex-direction: column;
         align-items: center;
-        .User,.headUserData{
+
+        .User,
+        .headUserData {
             display: grid;
             grid-template-columns: 8rem 8rem 1fr;
-            align-items: center ;
+            align-items: center;
             background-color: var(--color-secondary);
             border-radius: 24px;
             margin: 10px;
             padding: 20px 30px;
             min-width: 930px;
-            h2{
+
+            h2 {
                 color: var(--color-white);
                 margin: 0;
             }
-            a{
+
+            a {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -123,25 +146,32 @@ header{
                 margin-right: 10px;
             }
         }
-        .headUserData{
+
+        .headUserData {
             z-index: 1;
             background-color: var(--color-primary);
         }
-        .VehicleRow, .headVehicleData {
+
+        .VehicleRow,
+        .headVehicleData {
             grid-template-columns: 10rem 1fr 1fr !important;
+
             h2:nth-child(2) {
                 text-align: center;
             }
+
             h2:last-child {
                 text-align: right;
             }
         }
+
         .search-container {
             margin: 15px 0 5px 0;
             width: 100%;
             max-width: 970px;
             display: flex;
             justify-content: flex-end;
+
             input {
                 width: 320px;
                 padding: 10px 16px;
@@ -153,14 +183,16 @@ header{
                 transition: all 0.3s ease;
                 background-color: var(--color-white);
             }
+
             input:focus {
                 border-color: #0056b3;
                 box-shadow: 0 0 8px rgba(0, 46, 94, 0.25);
             }
         }
-        .loading-text{
+
+        .loading-text {
             color: var(--color-primary);
-            
+
             text-align: center;
             font-size: 18px;
             padding: 20px;
@@ -170,16 +202,21 @@ header{
 
 /* user more details */
 
-.moreUserde.active{
-    .homeDetail{
+.moreUserde.active {
+    .homeDetail {
         display: flex;
         flex-direction: column;
-        .homeNumber,.nameOwner,.TimeData{
+
+        .homeNumber,
+        .nameOwner,
+        .TimeData {
             display: flex;
             flex-direction: row;
             background-color: var(--color-primary);
             margin: 1rem 1rem 0;
-            .homeList{
+            border-radius: 1.5rem;
+
+            .homeList {
                 box-sizing: border-box;
                 color: var(--color-white);
                 padding: 20px;
@@ -188,29 +225,36 @@ header{
             }
         }
     }
-    .vehicleUser{
+
+    .vehicleUser {
         margin-top: 10px;
-        .vehicleList{
+
+        .vehicleList {
             margin: 1rem 1rem 0;
-            color: var(--color-white);;
+            color: var(--color-white);
+            border-radius: 1.5rem;
             background-color: var(--color-primary);
             text-align: center;
             padding: 10px 0;
         }
-        .headVlist{
+
+        .headVlist {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             align-items: center;
             margin: 0.625rem 1rem 0;
             background-color: var(--color-primary);
-            .Vlist{
+            border-radius: 1.5rem;
+
+            .Vlist {
                 color: var(--color-white);
                 padding: 10px;
                 margin: 0;
                 text-align: center;
                 font-size: 1.5rem;
             }
-            a{
+
+            a {
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -233,27 +277,34 @@ header{
 
 #page-vehicleDetail {
 
-    background-color: var(--color-bg); 
+    background-color: var(--color-bg);
     padding: 30px 20px;
     min-height: 100vh;
 }
 
 .vehicle-card {
-    max-width: 56.25rem; /* กำหนดขนาดความกว้างสูงสุดให้พอดี */
-    margin: 0 auto;   /* จัดให้อยู่กึ่งกลางหน้าจอ */
+    max-width: 56.25rem;
+    /* กำหนดขนาดความกว้างสูงสุดให้พอดี */
+    margin: 0 auto;
+    /* จัดให้อยู่กึ่งกลางหน้าจอ */
     display: flex;
     flex-direction: column;
-    gap: 8px; /* ระยะห่างระหว่างแถว */
+    gap: 8px;
+    /* ระยะห่างระหว่างแถว */
     font-family: sans-serif;
 }
 
 /* สไตล์กล่องสีน้ำเงินพื้นฐาน */
-.v-title, .v-date, .v-item {
-    background-color: var(--color-primary); /* สีน้ำเงินเข้มตามรูป */
+.v-title,
+.v-date,
+.v-item {
+    background-color: var(--color-primary);
+    /* สีน้ำเงินเข้มตามรูป */
     color: var(--color-white);
     text-align: center;
     padding: 15px;
     font-size: 1.2rem;
+    border-radius: 1rem;
 }
 
 /* ปรับแต่งส่วน Header ให้ตัวใหญ่และหนาขึ้น */
@@ -271,29 +322,39 @@ header{
 /* ใช้ CSS Grid แบ่งข้อมูลเป็น 2 คอลัมน์ */
 .v-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* แบ่งครึ่ง 50/50 */
-    gap: 8px 15px; /* ระยะห่าง บน-ล่าง 8px, ซ้าย-ขวา 15px */
+    grid-template-columns: 1fr 1fr;
+    /* แบ่งครึ่ง 50/50 */
+    gap: 8px 15px;
+    /* ระยะห่าง บน-ล่าง 8px, ซ้าย-ขวา 15px */
 }
 
 /* ปรับแต่งกล่องเวลาให้สูงและจัดข้อความไว้ด้านบน */
 .v-item.v-time {
     min-height: 250px;
-    max-height: 350px; /* กำหนดความสูงสูงสุด (ถ้าข้อมูลเยอะกว่านี้จะเกิด Scroll) */
+    max-height: 350px;
+    /* กำหนดความสูงสูงสุด (ถ้าข้อมูลเยอะกว่านี้จะเกิด Scroll) */
     font-size: 1.5rem;
     display: flex;
-    flex-direction: column; /* สั่งให้ข้อมูลเรียงจากบนลงล่าง */
-    justify-content: flex-start; /* ดันข้อมูลให้เริ่มจากขอบบน */
+    flex-direction: column;
+    /* สั่งให้ข้อมูลเรียงจากบนลงล่าง */
+    justify-content: flex-start;
+    /* ดันข้อมูลให้เริ่มจากขอบบน */
     align-items: center;
-    padding-top: 15px; /* ลด padding-top ลงนิดหน่อยให้พอดีกับข้อมูล */
-    gap: 10px; /* ระยะห่างระหว่างรอบเวลา */
-    overflow-y: auto; /* เปิดใช้งาน Scrollbar แนวตั้งถ้าข้อมูลล้น */
+    padding-top: 15px;
+    /* ลด padding-top ลงนิดหน่อยให้พอดีกับข้อมูล */
+    gap: 10px;
+    /* ระยะห่างระหว่างรอบเวลา */
+    overflow-y: auto;
+    /* เปิดใช้งาน Scrollbar แนวตั้งถ้าข้อมูลล้น */
 }
 
 /* --- เพิ่มตัวใหม่ --- */
 .time-record {
-    width: 80%; /* ความกว้างของเส้นคั่น */
+    width: 80%;
+    /* ความกว้างของเส้นคั่น */
     padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* เส้นคั่นสีขาวจางๆ */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    /* เส้นคั่นสีขาวจางๆ */
 }
 
 /* เอาเส้นคั่นของรายการสุดท้ายออก จะได้ดูสวยงาม */
@@ -306,11 +367,13 @@ header{
 .v-item.v-time::-webkit-scrollbar {
     width: 6px;
 }
+
 .v-item.v-time::-webkit-scrollbar-track {
-    background: #002244; 
+    background: #002244;
     border-radius: 10px;
 }
+
 .v-item.v-time::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.5); 
+    background: rgba(255, 255, 255, 0.5);
     border-radius: 10px;
 }
