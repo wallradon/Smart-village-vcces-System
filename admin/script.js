@@ -8,8 +8,10 @@ if (sessionStorage.getItem("isLoggedIn") !== "true") {
 }
 
 // ===================== ตัวแปรสถานะหลักของแอป (Global App State) =====================
-const url = "./dataTest.json"; // ที่อยู่ของไฟล์ JSON หรือ API endpoint สำหรับโหลดข้อมูลลูกบ้าน
-let mainData = [];       // ตัวแปรส่วนกลางสำหรับเก็บข้อมูลลูกบ้านทั้งหมดหลังจากดึงจากเซิร์ฟเวอร์เสร็จสิ้น
+const gUsers = "users/getUsers"; // ข้อมูลลูกบ้าน
+const gVehicles = "vehicles/getVehicles"; // ข้อมูลรถ
+let UsersData = [];       // ตัวแปรส่วนกลางสำหรับเก็บข้อมูลลูกบ้านทั้งหมดหลังจากดึงจากเซิร์ฟเวอร์เสร็จสิ้น
+let vehiclesData = [];    // ตัวแปรส่วนกลางสำหรับเก็บข้อมูลรถทั้งหมดหลังจากดึงจากเซิร์ฟเวอร์เสร็จสิ้น
 let isLoading = true;    // สถานะการดาวน์โหลดข้อมูล (true = กำลังดาวน์โหลดข้อมูล, false = ดึงข้อมูลเสร็จสิ้นแล้ว)
 // fetchStatus ได้ถูกประกาศใช้ใน API.js เพื่อติดตามสถานะ HTTP Response ล่าสุด
 
@@ -115,7 +117,7 @@ function renderUserPage(target, params) {
     // 5. หากดาวน์โหลดข้อมูลเสร็จสมบูรณ์ ให้นำข้อมูลมาแสดงผลแยกตามชื่อหน้า (target)
     if (target === "user") {
         console.log(`เปิดหน้าแสดงรายการข้อมูลลูกบ้านทั้งหมด`);
-        renderUserList(mainData);
+        renderUserList(UsersData);
     } else if (target === "userDetail") {
         console.log(`เปิดหน้าแสดงรายละเอียดของลูกบ้าน ID:`, params.id);
         renderUserDetail(Number(params.id));
@@ -124,7 +126,7 @@ function renderUserPage(target, params) {
         renderVehicleDetail(Number(params.id), Number(params.carIndex));
     } else if (target === "vehicle") {
         console.log(`เปิดหน้าแสดงประวัติยานพาหนะเข้า-ออกทั้งหมด`);
-        renderVehicleList(mainData);
+        (UsersData);
     } else if (target === "home") {
         // สามารถเพิ่มการเรนเดอร์หน้าแรก Dashboard หรือสถิติที่นี่ในอนาคต
     }
@@ -200,10 +202,10 @@ function renderUserList(users) {
 
     let htmlContent = "";
     // วนลูปสร้าง HTML รายชื่อลูกบ้าน
-    users.forEach(user => {
+    users.forEach((user, index) => {
         htmlContent += `
         <div class="User">
-            <h2>${user.id}</h2>
+            <h2>${index + 1}</h2>
             <h2>${user.houseNumber}</h2>
             <!-- ลิงก์สำหรับกดเข้าไปดูรายละเอียดข้อมูลบ้านและผู้พักอาศัยเพิ่มเติม โดยอ้างอิง data-id -->
             <a href="#" data-id="${user.id}" data-target="userDetail" >แสดงข้อมูลเพิ่มเติม</a>
@@ -221,7 +223,14 @@ function renderUserList(users) {
  */
 function renderUserDetail(userId) {
     // ค้นหาข้อมูลลูกบ้านโดยใช้ ID
-    const user = mainData.find(u => u.id === userId);
+    const user = UsersData.find(u => u.id === userId);
+
+    // ค้นหารถทุกคันของลูกบ้าน (ใช้ filter เพื่อดึงมาเป็น Array เพราะอาจมีหลายคัน)
+    // ก่อนใช้งาน vehiclesData อย่าลืมเช็คว่ามันเป็น Array หรือไม่
+    const userVehicles = Array.isArray(vehiclesData)
+        ? vehiclesData.filter(v => v.user_id === userId)
+        : [];
+
     const userDetailContainer = document.querySelector('#page-userDetail');
 
     // ป้องกันแอปพลิเคชันค้างกรณีหากค้นหาผู้ใช้งานคนนี้ไม่พบในระบบ
@@ -233,8 +242,8 @@ function renderUserDetail(userId) {
 
     // วนลูปดึงข้อมูลรถทั้งหมดของบ้านหลังนี้มาจัดทำรายการ HTML
     let vehiclesHTML = '';
-    if (user.vehicles && user.vehicles.length > 0) {
-        user.vehicles.forEach((vehicle, index) => {
+    if (userVehicles.length > 0) {
+        userVehicles.forEach((vehicle, index) => {
             vehiclesHTML += `
             <div class="headVlist">
                 <p class="Vlist">${vehicle.plate}</p>
@@ -264,8 +273,8 @@ function renderUserDetail(userId) {
                     <p class="homeList">${user.ownerName}</p>
                 </div>
                 <div class="TimeData">
-                    <p class="homeList">วันที่เข้าอยู่: ${user.regitter ?? '-'}</p>
-                    <p class="homeList">วันที่สมัครสมาชิก: ${user.dateMember ?? '-'} | วันหมดอายุการใช้งาน: ${user.MemberTimeout ?? '-'}</p>
+                    <p class="homeList">วันที่เข้าอยู่: ${user.registerDate ?? '-'}</p>
+                    <p class="homeList">วันที่สมัครสมาชิก: ${user.memberStartDate ?? '-'} | วันหมดอายุการใช้งาน: ${user.memberExpireDate ?? '-'}</p>
                 </div>
             </section>
             <section class="vehicleUser">
@@ -287,7 +296,7 @@ function renderUserDetail(userId) {
  * @param {number} vehicleIndex - ลำดับของรถที่ระบุในรายการ Array (เช่น คันแรก = 0, คันสอง = 1)
  */
 function renderVehicleDetail(userId, vehicleIndex) {
-    const user = mainData.find(u => u.id === userId);
+    const user = UsersData.find(u => u.id === userId);
     const vehicleDetailContainer = document.querySelector("#page-vehicleDetail");
     if (!user) {
         vehicleDetailContainer.innerHTML = `<p class="loading-text">ไม่พบข้อมูลเจ้าบ้าน</p>`;
@@ -370,5 +379,25 @@ document.querySelector('.main-content').addEventListener('click', (e) => {
     showPage(target, params);
 });
 
-// เริ่มดึงข้อมูลลูกบ้านทันทีที่เว็บแอปพลิเคชันหรือสคริปต์ตัวนี้ถูกเรียกใช้งาน
-getUser(url);
+
+async function initData() {
+    isLoading = true;
+    refreshCurrentPage(); // แสดง UI แบบ Loading ระหว่างรอข้อมูล
+
+    try {
+        // รอให้ทั้งข้อมูลลูกบ้านและข้อมูลรถโหลดเสร็จสมบูรณ์ทั้งคู่
+        await Promise.all([
+            getUser(gUsers),
+            getVehicles(gVehicles)
+        ]);
+    } catch (error) {
+        console.error("เกิดข้อผิดพลาดในการโหลดข้อมูลเริ่มต้น:", error);
+    } finally {
+        // เมื่อโหลดเสร็จ (ไม่ว่าจะสำเร็จหรือล้มเหลว) ค่อยปิดสถานะ Loading และอัปเดต UI ครั้งเดียว
+        isLoading = false;
+        refreshCurrentPage();
+    }
+}
+
+// เริ่มต้นดึงข้อมูลเมื่อสคริปต์โหลดเสร็จ
+initData();

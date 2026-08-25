@@ -37,7 +37,7 @@ async function createUser(userData) {
 }
 
 // ตัวแปรสำหรับเก็บ HTTP status จากการ fetch ข้อมูลรอบล่าสุด (0 = ยังไม่เคยลองดึงข้อมูล)
-let fetchStatus = 0;     
+let fetchStatus = 0;
 
 /**
  * ฟังก์ชันดึงข้อมูลผู้ใช้ทั้งหมดจากไฟล์ JSON หรือ API (GET Request)
@@ -45,41 +45,61 @@ let fetchStatus = 0;
  */
 async function getUser(path) {
     try {
-        // จำลองการหน่วงเวลา 3 วินาที (3000ms) เพื่อทดสอบสถานะการโหลด (Loading state) ในระหว่างการพัฒนา
-        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // สร้าง URL โดยรวม API_BASE_URL กับ path ที่เป็น Endpoint
+        const fullUrl = new URL(path, API_BASE_URL);
 
         // ส่งคำร้อง GET Request ไปยังปลายทาง
-        const res = await fetch(path);
-        
+        const res = await fetch(fullUrl);
+
         // อัปเดตรหัสสถานะการตอบรับ (เช่น 200, 404, 500)
         fetchStatus = res.status;
-        
+
         // หาก HTTP status ไม่ผ่านเกณฑ์สำเร็จ ให้ข้ามไปทำงานในบล็อก catch
         if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
 
         // แปลงข้อมูลที่ดึงได้ให้อยู่ในรูปของ JSON
         const data = await res.json();
-        
-        // บันทึกข้อมูลลงใน mainData (Global State)
-        mainData = data;
-        
-        // ตั้งค่าสถานะการโหลดเป็น false (โหลดเสร็จสิ้น)
-        isLoading = false;
-        
-        // รีเฟรชข้อมูลในหน้าเพจที่กำลังแสดงอยู่ในปัจจุบันเพื่ออัปเดต UI ทันที
-        refreshCurrentPage(); 
+
+        // บันทึกข้อมูลลงใน getUsers (Global State)
+        UsersData = data;
+
     } catch (err) {
         console.log("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
-        
-        // สิ้นสุดการโหลดข้อมูลแม้ว่าจะเกิดข้อผิดพลาดก็ตาม
-        isLoading = false;
-        
+
         // หาก fetchStatus เป็น 0 แสดงว่าส่งคำขอไม่ถึงปลายทางเลย (เช่น ขัดข้องที่อินเทอร์เน็ต)
         // ให้กำหนดรหัสผิดพลาดเป็น 500 เพื่อนำไปแสดงผลบน UI (Error State)
         if (fetchStatus === 0) fetchStatus = 500;
-        
-        // อัปเดตหน้าเพจปัจจุบันให้แสดงข้อความแจ้งเตือนข้อผิดพลาด
-        refreshCurrentPage();
+    }
+}
+async function getVehicles(path) {
+    try {
+
+        // สร้าง URL โดยรวม API_BASE_URL กับ path ที่เป็น Endpoint
+        const fullUrl = new URL(path, API_BASE_URL);
+
+        // ส่งคำร้อง GET Request ไปยังปลายทาง
+        const res = await fetch(fullUrl);
+
+        // อัปเดตรหัสสถานะการตอบรับ (เช่น 200, 404, 500)
+        fetchStatus = res.status;
+
+        // หาก HTTP status ไม่ผ่านเกณฑ์สำเร็จ ให้ข้ามไปทำงานในบล็อก catch
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+
+        // แปลงข้อมูลที่ดึงได้ให้อยู่ในรูปของ JSON
+        const data = await res.json();
+
+        // บันทึกข้อมูลลงใน getVehicles (Global State) 
+        // สกัดเอาเฉพาะส่วน data ที่เป็น Array มาใช้งาน
+        vehiclesData = data.data || [];
+
+    } catch (err) {
+        console.log("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
+
+        // หาก fetchStatus เป็น 0 แสดงว่าส่งคำขอไม่ถึงปลายทางเลย (เช่น ขัดข้องที่อินเทอร์เน็ต)
+        // ให้กำหนดรหัสผิดพลาดเป็น 500 เพื่อนำไปแสดงผลบน UI (Error State)
+        if (fetchStatus === 0) fetchStatus = 500;
     }
 }
 
