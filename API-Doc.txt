@@ -1,0 +1,312 @@
+const gUsers = "users/getUsers"; // pathข้อมูลลูกบ้าน
+[
+  {
+    "id": 1,
+    "houseNumber": "1",
+    "ownerName": "สมหมาย",
+    "username": "adaaaqqqqq",
+    "password": "1234",
+    "role": "resident",
+    "registerDate": "15/10/2026",
+    "memberStartDate": "15/10/2026",
+    "memberExpireDate": "15/11/2026"
+  },
+  {
+    "id": 2,
+    "houseNumber": "2",
+    "ownerName": "สมหมาย",
+    "username": "adaaaqq",
+    "password": "1234",
+    "role": "resident",
+    "registerDate": "15/10/2026",
+    "memberStartDate": "15/10/2026",
+    "memberExpireDate": "15/11/2026"
+  },
+  {
+    "id": 3,
+    "houseNumber": "99",
+    "ownerName": "ลำลอง ฟองดำ",
+    "username": "99",
+    "password": "pass123",
+    "role": "member",
+    "registerDate": "2019-09-09",
+    "memberStartDate": "2019-09-09",
+    "memberExpireDate": "2027-08-27"
+  },
+  {
+    "id": 4,
+    "houseNumber": "4",
+    "ownerName": "สมหมาย",
+    "username": "addd",
+    "password": "1234",
+    "role": "resident",
+    "registerDate": "15/10/2026",
+    "memberStartDate": "15/10/2026",
+    "memberExpireDate": "15/11/2026"
+  },
+  {
+    "id": 5,
+    "houseNumber": "158/1",
+    "ownerName": "123",
+    "username": null,
+    "password": null,
+    "role": null,
+    "registerDate": "2026-08-04",
+    "memberStartDate": "2026-08-04",
+    "memberExpireDate": "2026-12-31"
+  },
+  {
+    "id": 6,
+    "houseNumber": "90000",
+    "ownerName": "1",
+    "username": "x",
+    "password": "1",
+    "role": "USER",
+    "registerDate": "99/2/99",
+    "memberStartDate": "88/3/88",
+    "memberExpireDate": "77/3/77"
+  },
+  {
+    "id": 7,
+    "houseNumber": "90000x",
+    "ownerName": "1",
+    "username": "xx",
+    "password": "1",
+    "role": "USER",
+    "registerDate": "99/2/99",
+    "memberStartDate": "88/3/88",
+    "memberExpireDate": "77/3/77"
+  },
+  {
+    "id": 8,
+    "houseNumber": "90000xx",
+    "ownerName": "1",
+    "username": "xxx",
+    "password": "1",
+    "role": "USER",
+    "registerDate": "99/2/99",
+    "memberStartDate": "88/3/88",
+    "memberExpireDate": "77/3/77"
+  },
+  {
+    "id": 9,
+    "houseNumber": "90001",
+    "ownerName": "Owner 1",
+    "username": "user1",
+    "password": "1234",
+    "role": "USER",
+    "registerDate": "99/2/99",
+    "memberStartDate": "88/3/88",
+    "memberExpireDate": "77/3/77"
+  },
+  {
+    "id": 10,
+    "houseNumber": "90002",
+    "ownerName": "Owner 2",
+    "username": "user2",
+    "password": "1234",
+    "role": "USER",
+    "registerDate": "99/2/99",
+    "memberStartDate": "88/3/88",
+    "memberExpireDate": "77/3/77"
+  },
+  {
+    "id": 11,
+    "houseNumber": "90003",
+    "ownerName": "Owner 3",
+    "username": "user3",
+    "password": "1234",
+    "role": "USER",
+    "registerDate": "99/2/99",
+    "memberStartDate": "88/3/88",
+    "memberExpireDate": "77/3/77"
+  },
+  {
+    "id": 12,
+    "houseNumber": "90004",
+    "ownerName": "Owner 4",
+    "username": "user4",
+    "password": "1234",
+    "role": "USER",
+    "registerDate": "99/2/99",
+    "memberStartDate": "88/3/88",
+    "memberExpireDate": "77/3/77"
+  },
+  {
+    "id": 13,
+    "houseNumber": "90005",
+    "ownerName": "Owner 5",
+    "username": "user5",
+    "password": "1234",
+    "role": "USER",
+    "registerDate": "99/2/99",
+    "memberStartDate": "88/3/88",
+    "memberExpireDate": "77/3/77"
+  },
+  {
+    "id": 14,
+    "houseNumber": "158/99",
+    "ownerName": "ทดสอบ ยิงยิง",
+    "username": null,
+    "password": null,
+    "role": null,
+    "registerDate": "2026-08-05",
+    "memberStartDate": "2026-08-05",
+    "memberExpireDate": "2026-12-31"
+  },
+  {
+    "id": 15,
+    "houseNumber": "158/999",
+    "ownerName": "ไก่กะต๊าก",
+    "username": null,
+    "password": null,
+    "role": null,
+    "registerDate": "2026-08-05",
+    "memberStartDate": "2026-08-05",
+    "memberExpireDate": "2026-12-31"
+  },
+  {
+    "id": 16,
+    "houseNumber": "4222",
+    "ownerName": "สมหมาย",
+    "username": "add",
+    "password": "1234",
+    "role": "resident",
+    "registerDate": "15/10/2026",
+    "memberStartDate": "15/10/2026",
+    "memberExpireDate": "15/11/2026"
+  },
+  {
+    "id": 17,
+    "houseNumber": "422244",
+    "ownerName": "สมหมาย",
+    "username": "addกกหดฟหกดหฟด",
+    "password": "1234",
+    "role": "resident",
+    "registerDate": "15/10/2026",
+    "memberStartDate": "15/10/2026",
+    "memberExpireDate": "15/11/2026"
+  },
+  {
+    "id": 18,
+    "houseNumber": "158/6",
+    "ownerName": "อุรัง อุตัง",
+    "username": null,
+    "password": "pass123",
+    "role": null,
+    "registerDate": "2026-08-09",
+    "memberStartDate": "2026-08-08",
+    "memberExpireDate": "2027-08-08"
+  },
+  {
+    "id": 19,
+    "houseNumber": "158/7",
+    "ownerName": "กุ๊กกุ๊ก กู๋",
+    "username": null,
+    "password": "pass123",
+    "role": null,
+    "registerDate": "2026-08-09",
+    "memberStartDate": "2026-08-07",
+    "memberExpireDate": "2027-08-07"
+  },
+  {
+    "id": 20,
+    "houseNumber": "99",
+    "ownerName": "ลำลอง",
+    "username": "ฟองดำ",
+    "password": "pass123",
+    "role": "member",
+    "registerDate": "2026-08-27",
+    "memberStartDate": "2019-09-09",
+    "memberExpireDate": "2020-09-09"
+  },
+  {
+    "id": 21,
+    "houseNumber": "10",
+    "ownerName": "สออิบอ",
+    "username": "สิบ",
+    "password": "pass123",
+    "role": "member",
+    "registerDate": "2026-08-27",
+    "memberStartDate": "2025-10-10",
+    "memberExpireDate": "2026-10-10"
+  }
+]
+
+const gVehicles = "vehicles/getVehicles"; // pathข้อมูลรถ
+
+    {
+      "id": 1,
+      "user_id": 1,
+      "ownerName": "สมหมาย",
+      "plate": "กข1234",
+      "province": "ลำพูน",
+      "type": "Car",
+      "registerDate": "05/08/2026"
+    },
+    {
+      "id": 2,
+      "user_id": 1,
+      "ownerName": "สมหมาย",
+      "plate": "กข12",
+      "province": "ลำพูน",
+      "type": "Car",
+      "registerDate": "05/08/2026"
+    },
+    {
+      "id": 3,
+      "user_id": 17,
+      "ownerName": "สมหมาย",
+      "plate": "กข1277",
+      "province": "ลำพูน",
+      "type": "Car",
+      "registerDate": "05/08/2026"
+    },
+    {
+      "id": 30001,
+      "user_id": 1,
+      "ownerName": "สมหมาย",
+      "plate": "ขค1234",
+      "province": "เชียงใหม่",
+      "type": "Car",
+      "registerDate": "11/08/2026"
+    }
+const pVeLog = "logs/getLogs"; // pathข้อมูลรถเข้าออก
+
+
+    {
+      "vehicle_id": 1,
+      "plate": "กข1234",
+      "type": "Car",
+      "camera_in": "Gate1",
+      "time_in": "2026-08-25T15:30:00.000Z",
+      "camera_out": "Gate2",
+      "time_out": "2026-08-25T19:00:00.000Z"
+    },
+    {
+      "vehicle_id": 2,
+      "plate": "กข12",
+      "type": "Car",
+      "camera_in": "Gate1",
+      "time_in": "2026-08-25T15:30:00.000Z",
+      "camera_out": null,
+      "time_out": null
+    },
+    {
+      "vehicle_id": 3,
+      "plate": "กข1277",
+      "type": "Car",
+      "camera_in": "Gate1",
+      "time_in": "2026-08-25T15:30:00.000Z",
+      "camera_out": null,
+      "time_out": null
+    },
+    {
+      "vehicle_id": 30001,
+      "plate": "ขค1234",
+      "type": "Car",
+      "camera_in": "Gate1",
+      "time_in": "2026-08-25T15:30:00.000Z",
+      "camera_out": null,
+      "time_out": null
+    }

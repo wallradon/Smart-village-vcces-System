@@ -1,23 +1,25 @@
 "use strict"
 
-// 0. ตรวจสอบสิทธิ์การเข้าถึง (Authentication Guard / Route Protection)
-// ตรวจสอบสถานะการเข้าสู่ระบบจาก sessionStorage
+// 0. ตรวจสอบสิทธิ์ (Authentication / Route Protection)
+// ตรวจสอบสถานะจาก sessionStorage (Session Storage)
 if (sessionStorage.getItem("isLoggedIn") !== "true") {
-    // หากไม่มีการเข้าสู่ระบบ (isLoggedIn ไม่เป็น "true") ให้ส่งกลับไปยังหน้า Login ทันที
+    // หากยังไม่เข้าสู่ระบบ (Not Logged In) ให้ส่งกลับหน้า Login (Redirect)
     window.location.href = "../login/login.html";
 }
 
 // ===================== ตัวแปรสถานะหลักของแอป (Global App State) =====================
-const gUsers = "users/getUsers"; // ข้อมูลลูกบ้าน
-const gVehicles = "vehicles/getVehicles"; // ข้อมูลรถ
-let UsersData = [];       // ตัวแปรส่วนกลางสำหรับเก็บข้อมูลลูกบ้านทั้งหมดหลังจากดึงจากเซิร์ฟเวอร์เสร็จสิ้น
-let vehiclesData = [];    // ตัวแปรส่วนกลางสำหรับเก็บข้อมูลรถทั้งหมดหลังจากดึงจากเซิร์ฟเวอร์เสร็จสิ้น
-let isLoading = true;    // สถานะการดาวน์โหลดข้อมูล (true = กำลังดาวน์โหลดข้อมูล, false = ดึงข้อมูลเสร็จสิ้นแล้ว)
+const gUsers = "users/getUsers"; // pathข้อมูลลูกบ้าน
+const gVehicles = "vehicles/getVehicles"; // pathข้อมูลรถ
+const pVeLog = "logs/getLogs"; // pathข้อมูลรถเข้าออก
+let UsersData = [];       // ตัวแปรส่วนกลาง (Global Variable) เก็บข้อมูลลูกบ้าน
+let vehiclesData = [];    // ตัวแปรส่วนกลาง (Global Variable) เก็บข้อมูลยานพาหนะ
+let VeLog = [];    // ตัวแปรส่วนกลาง (Global Variable) เก็บข้อมูลเข้าออกยานพาหนะทั้งหมด
+let isLoading = true;     // สถานะการโหลด (Loading State)
 // fetchStatus ได้ถูกประกาศใช้ใน API.js เพื่อติดตามสถานะ HTTP Response ล่าสุด
 
 // ===================== เมนู / การสลับหน้า (Menu Navigation & Page Router) =====================
-const navItems = document.querySelectorAll('nav li[data-target]'); // ดึงปุ่มเมนูทั้งหมดใน Navbar ที่มี data-target
-const pages = document.querySelectorAll('.page');                  // ดึง element หน้าเนื้อหาทั้งหมดที่มี class "page"
+const navItems = document.querySelectorAll('nav li[data-target]'); // ดึงปุ่มเมนู (Nav Items)
+const pages = document.querySelectorAll('.page');                  // ดึงหน้าเนื้อหาทั้งหมด (Page Elements)
 
 
 /**
@@ -26,28 +28,28 @@ const pages = document.querySelectorAll('.page');                  // ดึง 
  * @param {Object} params - พารามิเตอร์อื่นๆ ที่ต้องการส่งต่อไปให้หน้าเพจปลายทาง (เช่น { id: 1, carIndex: 0 })
  */
 function showPage(target, params) {
-    // 1. ซ่อนหน้าเพจทั้งหมดก่อน โดยเอาคลาส 'active' ออก
+    // 1. ซ่อนหน้าทั้งหมด (Hide all pages)
     pages.forEach(page => page.classList.remove('active'));
 
-    // 2. ยกเลิกการเน้นสีเมนูใน Navbar ทั้งหมด โดยเอาคลาส 'user-select' ออก
+    // 2. ยกเลิกไฮไลต์เมนู (Reset nav highlights)
     navItems.forEach(li => li.classList.remove('user-select'));
 
-    // 3. แสดงหน้าเพจปลายทางที่เลือก โดยเพิ่มคลาส 'active' กลับเข้าไปที่ id ของหน้านั้นๆ (#page-[target])
+    // 3. แสดงหน้าเป้าหมาย (Show target page)
     const targetPage = document.querySelector(`#page-${target}`);
     if (targetPage) {
         targetPage.classList.add('active');
-        renderUserPage(target, params);       // เรียกใช้ฟังก์ชันตัวกลางเพื่อ Render ข้อมูลลงในหน้านี้
+        renderUserPage(target, params);       // เรียกใช้ฟังก์ชันแสดงผล (Render Data)
     }
 
-    // 4. ไฮไลต์ปุ่มเมนูใน Navbar ของหน้าปัจจุบันเพื่อให้ผู้ใช้ทราบว่ากำลังอยู่ในเมนูใด
+    // 4. ไฮไลต์เมนูปัจจุบัน (Highlight active nav item)
     const activeLi = document.querySelector(`nav li[data-target="${target}"]`);
     if (activeLi) activeLi.classList.add('user-select');
 }
 
-// ผูกเหตุการณ์คลิก (Click Event) ให้กับเมนูทุกอันใน Navbar เพื่อเรียกใช้งานฟังก์ชันสลับหน้า showPage
+// ดักจับเหตุการณ์คลิก (Click Event) เพื่อสลับหน้า
 navItems.forEach(li => {
     li.addEventListener('click', (e) => {
-        e.preventDefault(); // ป้องกันพฤติกรรมเริ่มต้นของเบราว์เซอร์
+        e.preventDefault(); // ป้องกันพฤติกรรมเริ่มต้น (Prevent Default)
         showPage(li.dataset.target); // เข้าถึงชื่อหน้าปลายทางผ่าน dataset.target และเปิดหน้านั้น
     });
 });
@@ -57,9 +59,9 @@ const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        // ลบสถานะการเข้าสู่ระบบจาก sessionStorage
+        // ลบข้อมูลการล็อกอิน (Clear Session)
         sessionStorage.removeItem("isLoggedIn");
-        // พาลูกบ้าน/ผู้จัดการระบบ กลับไปยังหน้าหลัก (Landing Page)
+        // กลับไปยังหน้าหลัก (Redirect to Landing Page)
         window.location.href = "../index.html";
     });
 }
@@ -69,24 +71,23 @@ showPage('home');
 
 
 /**
- * ฟังก์ชันสำหรับอัปเดต/รีเฟรชข้อมูลในหน้าเพจที่เปิดอยู่ ณ ปัจจุบัน
- * มักถูกเรียกใช้หลังจากดึงข้อมูลจาก API หรือ JSON เสร็จเรียบร้อย
+ * อัปเดตข้อมูลในหน้าปัจจุบัน (Refresh Current Page)
+ * ใช้หลังจากดึงข้อมูลจาก API (Fetch API) เสร็จแล้ว
  */
 function refreshCurrentPage() {
-    // ค้นหาว่าเมนูใดในแถบนำทางกำลังเป็นเมนูที่ถูกเลือกใช้งานอยู่
+    // หาเมนูที่เปิดอยู่และอัปเดตหน้า (Re-render Active Page)
     const activeLi = document.querySelector('nav li.user-select');
     if (activeLi) {
         const target = activeLi.dataset.target;
-        // ทำการ Render เนื้อหาของหน้านั้นใหม่อีกครั้งเพื่ออัปเดต UI ให้สอดคล้องกับข้อมูลใหม่
         renderUserPage(target, null);
     }
 }
 
-// ===================== ตัวกลางตัดสินใจว่าจะ render อะไร (Render Router) =====================
+// ===================== ตัวจัดการแสดงผล (Render Router) =====================
 /**
- * ฟังก์ชันตัวกลางสำหรับตรวจสอบสถานะของข้อมูล (Loading/Error/Success) ก่อนทำการแสดงผลในหน้านั้นๆ
- * @param {string} target - หน้าเพจปลายทาง
- * @param {Object} params - ข้อมูลพารามิเตอร์ส่งผ่าน (เช่น id ของผู้ใช้งาน)
+ * ตรวจสอบสถานะข้อมูลและแสดงผล (Render Page based on Data Status)
+ * @param {string} target - หน้าปลายทาง
+ * @param {Object} params - พารามิเตอร์
  */
 function renderUserPage(target, params) {
     // 1. ค้นหา element ของหน้าเพจที่ผู้ใช้เปิดอยู่
@@ -122,11 +123,11 @@ function renderUserPage(target, params) {
         console.log(`เปิดหน้าแสดงรายละเอียดของลูกบ้าน ID:`, params.id);
         renderUserDetail(Number(params.id));
     } else if (target === "vehicleDetail") {
-        console.log(`เปิดหน้าแสดงรายละเอียดประวัติเข้า-ออกของยานพาหนะ ID: ${params.id}, ลำดับรถ: ${params.carIndex}`);
-        renderVehicleDetail(Number(params.id), Number(params.carIndex));
+        console.log(`เปิดหน้าแสดงรายละเอียดประวัติเข้า-ออกของยานพาหนะ ID: ${params.id}, ทะเบียน: ${params.carPlate}`);
+        renderEachVehicle(Number(params.id), String(params.carPlate));
     } else if (target === "vehicle") {
         console.log(`เปิดหน้าแสดงประวัติยานพาหนะเข้า-ออกทั้งหมด`);
-        (UsersData);
+        renderVehicleList(VeLog);
     } else if (target === "home") {
         // สามารถเพิ่มการเรนเดอร์หน้าแรก Dashboard หรือสถิติที่นี่ในอนาคต
     }
@@ -137,56 +138,48 @@ function renderUserPage(target, params) {
  * ฟังก์ชันจัดการ Render รายชื่อประเภทรถ, ป้ายทะเบียน และเวลาเข้า-ออกทั้งหมดที่มีในระบบลงในหน้า VEHICLE DATA
  * @param {Array} users - ชุดข้อมูลลูกบ้านทั้งหมดพร้อมรายการยานพาหนะ
  */
-function renderVehicleList(users) {
+function renderVehicleList(data) {
     const vehicleDataContainer = document.querySelector('#VehicleData');
     if (!vehicleDataContainer) return; // ยุติหากไม่พบ container บนหน้าเว็บ
 
     let htmlContent = "";
     let foundCount = 0; // ตัวแปรสำหรับนับจำนวนข้อมูลรถที่ประมวลผล
-
     // วนลูปตรวจสอบข้อมูลผู้ใช้แต่ละราย
-    users.forEach(user => {
+    data.forEach(d => {
         // คัดกรองเฉพาะผู้ใช้ที่มีข้อมูลยานพาหนะลงทะเบียนไว้
-        if (user.vehicles && user.vehicles.length > 0) {
-            user.vehicles.forEach((vehicle) => {
-                const plate = vehicle.plate || ""; // ป้ายทะเบียนรถ
-                const type = vehicle.type || "-";    // ประเภทรถ (เช่น รถยนต์, จักรยานยนต์)
-
-                // หากรถคันดังกล่าวมีประวัติเวลาเข้า-ออกระบบแล้ว ให้ทำการวนลูปแสดงรายละเอียดประวัติแต่ละรอบ
-                if (vehicle.timeInOut && vehicle.timeInOut.length > 0) {
-                    vehicle.timeInOut.forEach((record) => {
-                        foundCount++;
-                        const recordText = `เข้า: ${record.in ?? '-'} | ออก: ${record.out ?? '-'}`;
-
-                        htmlContent += `
+        console.log("datavehicle", d);
+        const plate = d.plate || "-"; // ป้ายทะเบียนรถ
+        const type = d.type || "-";    // ประเภทรถ (เช่น รถยนต์, จักรยานยนต์)
+        if (d.time_in) {
+            foundCount++;
+            const recordText = `เข้า: ${d.time_in ?? '-'} | ออก: ${d.time_out ?? '-'}`;
+            htmlContent += `
                         <div class="User VehicleRow">
                             <h2>${type}</h2>
                             <h2>${plate}</h2>
                             <h2>${recordText}</h2>
                         </div>
                         `;
-                    });
-                } else {
-                    // หากยังไม่มีประวัติการเข้า-ออกเลย ให้แสดงรายละเอียดข้อมูลรถพร้อมแจ้งเตือนว่ายังไม่มีประวัติ
-                    foundCount++;
-                    htmlContent += `
+        } else {
+            // หากยังไม่มีประวัติการเข้า-ออกเลย ให้แสดงรายละเอียดข้อมูลรถพร้อมแจ้งเตือนว่ายังไม่มีประวัติ
+            foundCount++;
+            htmlContent += `
                     <div class="User VehicleRow">
                         <h2>${type}</h2>
                         <h2>${plate}</h2>
                         <h2>ยังไม่มีประวัติเข้า-ออกในระบบ</h2>
                     </div>
                     `;
-                }
-            });
         }
+
     });
 
     // หากไม่พบรถของใครที่มีประวัติหรือลงทะเบียนไว้ในหมู่บ้านเลย ให้ขึ้นแจ้งเตือน
     if (foundCount === 0) {
-        htmlContent = `<p class="loading-text">ไม่พบข้อมูลยานพาหนะในระบบ</p>`;
+        htmlContent = `<p class="loading-text">ไม่พบข้อมูลยานพาหนะในระบบeiei</p>`;
     }
 
-    // เขียนโครงสร้าง HTML ลงหน้าแสดงผล
+    // // เขียนโครงสร้าง HTML ลงหน้าแสดงผล
     vehicleDataContainer.innerHTML = htmlContent;
 }
 
@@ -249,7 +242,7 @@ function renderUserDetail(userId) {
                 <p class="Vlist">${vehicle.plate}</p>
                 <p class="Vlist">${vehicle.type}</p>
                 <!-- ลิงก์สำหรับขอดูเวลาเข้า-ออกโดยเฉพาะของรถคันนี้ โดยส่ง id ลูกบ้าน และ index ของรถไปใน dataset -->
-                <a href="" data-target="vehicleDetail" data-car-index="${index}" data-id="${user.id}">แสดงข้อมูลเพิ่มเติม</a>
+                <a href="" data-target="vehicleDetail" data-car-plate="${vehicle.plate}" data-id="${user.id}">แสดงข้อมูลเพิ่มเติม</a>
             </div>`;
         });
     } else {
@@ -295,17 +288,26 @@ function renderUserDetail(userId) {
  * @param {number} userId - รหัส ID ของเจ้าบ้านผู้ถือกรรมสิทธิ์รถ
  * @param {number} vehicleIndex - ลำดับของรถที่ระบุในรายการ Array (เช่น คันแรก = 0, คันสอง = 1)
  */
-function renderVehicleDetail(userId, vehicleIndex) {
-    const user = UsersData.find(u => u.id === userId);
+function renderEachVehicle(userId, vehiclePlate) {
+    // หาข้อมูลรถของลูกบ้านหลัง
+    const vData = vehiclesData.filter(p => p.user_id === userId);
+    console.log("vData:", vData);
+    // ดึงเฉพาะคันนั้นมาแสดง
+    const vehicle = vData.find(v => v.plate === vehiclePlate);
+    console.log("vehicle:", vehicle);
+    // ดึงเวลาเข้าออก
+    // const timeStamp = VeLog.filter(t => t.plate === vehiclePlate && t.user_id === userId);
+    const timeStamp = VeLog.filter(t => t.plate === vehiclePlate );
+    console.log("timeStamp:", timeStamp);
+
     const vehicleDetailContainer = document.querySelector("#page-vehicleDetail");
-    if (!user) {
+    if (!vData) {
         vehicleDetailContainer.innerHTML = `<p class="loading-text">ไม่พบข้อมูลเจ้าบ้าน</p>`;
         return;
     }
 
     // คัดกรองตัวรถยนต์โดยอ้างอิงลำดับดัชนีของ array รถ
-    const vehicleData = user.vehicles[vehicleIndex];
-    if (!vehicleData) {
+    if (!vehicle) {
         vehicleDetailContainer.innerHTML = `<p class="loading-text">ไม่พบข้อมูลยานพาหนะของเจ้าบ้านหลังนี้</p>`;
         return;
     }
@@ -314,14 +316,14 @@ function renderVehicleDetail(userId, vehicleIndex) {
     let timeInHTML = '';
     let timeOutHTML = '';
 
-    // ตรวจสอบว่ามีข้อมูลเวลาบันทึกเข้าออกบ้างหรือไม่
-    if (vehicleData.timeInOut && vehicleData.timeInOut.length > 0) {
-        vehicleData.timeInOut.forEach((timeRecord) => {
+    // // ตรวจสอบว่ามีข้อมูลเวลาบันทึกเข้าออกบ้างหรือไม่
+    if (timeStamp.length > 0) {
+        timeStamp.forEach((timeRecord) => {
             timeInHTML += `
-            <span class="time-record">${timeRecord.in ?? '-'}</span>
+            <span class="time-record">${timeRecord.time_in ?? '-'}</span>
             `;
             timeOutHTML += `
-            <span class="time-record">${timeRecord.out ?? '-'}</span>
+            <span class="time-record">${timeRecord.time_out ?? '-'}</span>
             `;
         });
     } else {
@@ -334,21 +336,21 @@ function renderVehicleDetail(userId, vehicleIndex) {
     let htmlContent = `<div class="vehicle-card">
     <!-- ส่วนแสดงหัวข้อการ์ดและวันลงทะเบียน -->
     <div class="v-title">รายละเอียดข้อมูลยานพาหนะ (Vehicle Details)</div>
-    <div class="v-date">ลงทะเบียนเข้าระบบ: ${vehicleData.regitter ?? '-'} </div>
-    
+    <div class="v-date">ลงทะเบียนเข้าระบบ: ${vehicle.registerDate ?? '-'} </div>
+
     <!-- ตารางแสดงรายละเอียดรถยนต์และบันทึกเวลา -->
     <div class="v-grid">
-        <div class="v-item">ป้ายทะเบียน: ${vehicleData.plate ?? '-'}</div>
-        <div class="v-item">ประเภทยานพาหนะ: ${vehicleData.type ?? '-'}</div>
-        
+        <div class="v-item">ป้ายทะเบียน: ${vehicle.plate ?? '-'}</div>
+        <div class="v-item">ประเภทยานพาหนะ: ${vehicle.type ?? '-'}</div>
+
         <div class="v-item" style="font-weight: bold;">ประวัติเวลาเข้า</div>
         <div class="v-item" style="font-weight: bold;">ประวัติเวลาออก</div>
-        
+
         <!-- รายการเวลาเข้า (ฝั่งซ้าย) -->
         <div class="v-item v-time" id="time-in-list">
             ${timeInHTML}
         </div>
-        
+
         <!-- รายการเวลาออก (ฝั่งขวา) -->
         <div class="v-item v-time" id="time-out-list">
             ${timeOutHTML}
@@ -358,18 +360,16 @@ function renderVehicleDetail(userId, vehicleIndex) {
     vehicleDetailContainer.innerHTML = htmlContent;
 }
 
-// ===================== ระบบดักจับเหตุการณ์คลิกลิงก์แบบสากล (Event Delegation) =====================
-// เนื่องจากข้อมูลลูกบ้าน และข้อมูลรถต่างๆ ถูกเรนเดอร์ขึ้นมาใหม่หลังจากโหลดหน้าจออยู่เสมอ
-// เพื่อหลีกเลี่ยงการเสียเวลาผูก addEventListener ให้ปุ่มใหม่ๆ เราจึงใช้ Event Delegation 
-// โดยคอยดักจับการคลิกที่กล่องครอบคลุมเนื้อหาหลัก `.main-content` เพียงจุดเดียว
+// ===================== ระบบดักจับเหตุการณ์คลิกแบบสากล (Event Delegation) =====================
+// ใช้ Event Delegation เพื่อดักจับคลิกใน .main-content ทำให้ไม่ต้องผูก Event (Event Listener) ใหม่ให้ปุ่มที่เพิ่งสร้าง
 document.querySelector('.main-content').addEventListener('click', (e) => {
-    // หาว่าสิ่งที่คลิกคือปุ่มหรือลิงก์ <a> ที่มี attribute data-target หรือไม่
+    // ตรวจสอบว่าสิ่งที่คลิกคือปุ่ม/ลิงก์ที่มี attribute data-target หรือไม่
     const link = e.target.closest('a[data-target]');
     if (!link) return; // หากเป็นการคลิกพื้นที่อื่นๆ ให้ข้ามการทำงานนี้ไป
 
-    e.preventDefault(); // ยกเลิกการรีโหลดหน้าของลิงก์แบบเดิม
+    e.preventDefault(); // ยกเลิกพฤติกรรมของลิงก์ (Prevent Default)
 
-    // แกะข้อมูลที่เก็บไว้บน HTML Element (data-target, data-id, data-car-index เป็นต้น)
+    // ดึงข้อมูลที่เก็บใน HTML attribute (Destructuring Dataset)
     const { target, ...params } = link.dataset;
 
     console.log(`การทำงานนำทาง: สลับไปยังหน้า ${target}`);
@@ -388,7 +388,8 @@ async function initData() {
         // รอให้ทั้งข้อมูลลูกบ้านและข้อมูลรถโหลดเสร็จสมบูรณ์ทั้งคู่
         await Promise.all([
             getUser(gUsers),
-            getVehicles(gVehicles)
+            getVehicles(gVehicles),
+            getVeLog(pVeLog)
         ]);
     } catch (error) {
         console.error("เกิดข้อผิดพลาดในการโหลดข้อมูลเริ่มต้น:", error);
@@ -399,5 +400,5 @@ async function initData() {
     }
 }
 
-// เริ่มต้นดึงข้อมูลเมื่อสคริปต์โหลดเสร็จ
+// เริ่มโหลดข้อมูลเมื่อโปรแกรมเริ่มทำงาน (Initialization)
 initData();
