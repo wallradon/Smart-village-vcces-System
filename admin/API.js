@@ -72,6 +72,8 @@ async function getUser(path) {
         if (fetchStatus === 0) fetchStatus = 500;
     }
 }
+
+
 async function getVehicles(path) {
     try {
 
