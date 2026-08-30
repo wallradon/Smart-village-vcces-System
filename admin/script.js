@@ -1,12 +1,5 @@
 "use strict"
 
-// 0. ตรวจสอบสิทธิ์ (Authentication / Route Protection)
-// ตรวจสอบสถานะจาก sessionStorage (Session Storage)
-if (sessionStorage.getItem("isLoggedIn") !== "true") {
-    // หากยังไม่เข้าสู่ระบบ (Not Logged In) ให้ส่งกลับหน้า Login (Redirect)
-    window.location.href = "../login/login.html";
-}
-
 // ===================== ตัวแปรสถานะหลักของแอป (Global App State) =====================
 const gUsers = "users/getUsers"; // pathข้อมูลลูกบ้าน
 const gVehicles = "vehicles/getVehicles"; // pathข้อมูลรถ
@@ -53,18 +46,6 @@ navItems.forEach(li => {
         showPage(li.dataset.target); // เข้าถึงชื่อหน้าปลายทางผ่าน dataset.target และเปิดหน้านั้น
     });
 });
-
-// ===================== ระบบออกจากระบบ (Logout System) =====================
-const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-    logoutBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        // ลบข้อมูลการล็อกอิน (Clear Session)
-        sessionStorage.removeItem("isLoggedIn");
-        // กลับไปยังหน้าหลัก (Redirect to Landing Page)
-        window.location.href = "../index.html";
-    });
-}
 
 // เปิดหน้าแรก (หน้า home) ทันทีที่ผู้ใช้งานเข้าสู่ระบบเป็นค่าเริ่มต้น
 showPage('home');
