@@ -48,7 +48,7 @@ navItems.forEach(li => {
 });
 
 // เปิดหน้าแรก (หน้า home) ทันทีที่ผู้ใช้งานเข้าสู่ระบบเป็นค่าเริ่มต้น
-showPage('home');
+showPage('vehicle');
 
 
 /**
@@ -278,7 +278,7 @@ function renderEachVehicle(userId, vehiclePlate) {
     console.log("vehicle:", vehicle);
     // ดึงเวลาเข้าออก
     // const timeStamp = VeLog.filter(t => t.plate === vehiclePlate && t.user_id === userId);
-    const timeStamp = VeLog.filter(t => t.plate === vehiclePlate );
+    const timeStamp = VeLog.filter(t => t.plate === vehiclePlate);
     console.log("timeStamp:", timeStamp);
 
     const vehicleDetailContainer = document.querySelector("#page-vehicleDetail");
