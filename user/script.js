@@ -95,6 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
             allLogsData = Array.isArray(logsData) ? logsData : (logsData.data || []);
 
             if (currentUserId) {
+                // หา user ที่เปิดหน้านี้
                 const matchedUser = allUsersData.find(u => String(u.id) === String(currentUserId));
                 if (matchedUser) {
                     currentUser = matchedUser;
@@ -442,9 +443,9 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = '../login/frontend/index.html';
             return;
         }
-        
+
         await syncDatabase();
-        
+
         if (currentUser) {
             updateAuthUI();
             renderPage('user');

@@ -5,15 +5,15 @@ const cors = require('cors');
 
 const app = express();
 
-// อนุญาตให้หน้าบ้านคุยกับหลังบ้านได้ และอ่านข้อมูล JSON ที่ส่งมาได้
+// Enable CORS to allow frontend communication and parse JSON data
 app.use(cors());
 app.use(express.json());
 
-//Secret Key สำหรับแกะ JWT (ในการใช้งานจริงควรเก็บในไฟล์ .env)
+// Secret key for JWT (In real apps, keep this in .env file)
 const JWT_SECRET = 'my_super_secret_key_12345';
 
-// 🗄️ จำลองฐานข้อมูล (Mock Database)
-// หมายเหตุ: รหัสผ่าน "123456" และ "password123" ถูกเข้ารหัสด้วย bcrypt (Salt rounds = 10)
+// 🗄️ Mock Database
+// Note: Passwords "123456" and "password123" are hashed with bcrypt (Salt rounds = 10)
 const usersDB = [
     {
         id: 27,
@@ -28,62 +28,100 @@ const usersDB = [
 ];
 
 
-// Route สำหรับ Login
-app.post('/api/login', async (req, res) => {
+// Route for Login
+app.post('/api/auth/login', async (req, res) => {
     try {
         const { username, usernameOrHouse, password } = req.body;
         const inputUser = (usernameOrHouse || username || '').trim().toLowerCase();
 
         if (!inputUser || !password) {
-            return res.status(400).json({ message: "กรุณากรอกชื่อผู้ใช้/เลขที่บ้าน และรหัสผ่าน" });
+            return res.status(400).json({ message: "Username/House number and password are required" });
         }
 
-        // 1. ค้นหาผู้ใช้ในฐานข้อมูล (ค้นหาจาก username)
+        // 1. Find user in database by username
         const user = usersDB.find(u =>
             u.username.toLowerCase() === inputUser
         );
 
         if (!user) {
-            return res.status(401).json({ message: "ชื่อผู้ใช้ หรือ รหัสผ่านไม่ถูกต้อง" });
+            return res.status(401).json({ message: "Invalid username or password" });
         }
 
-        // 2. ตรวจสอบรหัสผ่านดิบด้วย bcrypt.compare
+        // 2. Check password with bcrypt.compare
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: "ชื่อผู้ใช้ หรือ รหัสผ่านไม่ถูกต้อง" });
+            return res.status(401).json({ message: "Invalid username or password" });
         }
 
-        // 3. สร้าง JWT Token เมื่อตรวจสอบผ่าน
+        // 3. Create JWT token when valid
         const token = jwt.sign(
             {
                 userId: user.id,
                 username: user.username
             },
             JWT_SECRET,
-            { expiresIn: '1h' } // Token หมดอายุใน 1 ชั่วโมง
+            { expiresIn: '1h' } // Token expires in 1 hour
         );
 
-        console.log(`[API] ล็อกอินสำเร็จ: ${user.username}`);
+        console.log(`[API] Login success: ${user.username}`);
 
-        // 4. ส่ง Token และข้อมูลเบื้องต้นกลับไปให้หน้าบ้าน
+        // 4. Send token and user info to frontend
         return res.json({
-            message: "เข้าสู่ระบบสำเร็จ",
+            message: "Login successful",
             token: token,
             id: user.id
         });
 
     } catch (error) {
         console.error('[API Error] login:', error);
-        return res.status(500).json({ message: "เกิดข้อผิดพลาดที่เซิร์ฟเวอร์" });
+        return res.status(500).json({ message: "Internal server error" });
     }
 });
 
-// เริ่มรันเซิร์ฟเวอร์บนพอร์ต 5000 หรือ 8080
+
+// Route for Register (Create new user for login)
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        // Get username and password for authentication
+        const { username, password } = req.body;
+
+        if (!username || !password) {
+            return res.status(400).json({ success: false, message: "Please enter your username and password" });
+        }
+
+        // Check for duplicate username
+        const isDuplicate = usersDB.find(u => u.username.toLowerCase() === username.toLowerCase());
+        if (isDuplicate) {
+            return res.status(400).json({ success: false, message: "Username is already taken. Please try another one." });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create new user account
+        const newUser = {
+            id: usersDB.length > 0 ? Math.max(...usersDB.map(u => u.id)) + 1 : 1,
+            username: username.toLowerCase(),
+            password: hashedPassword
+        };
+
+        usersDB.push(newUser);
+        console.log(`[API] Create User account successfully: ${newUser.username}`);
+
+        return res.status(201).json({ success: true, message: "Account created successfully" });
+
+    } catch (error) {
+        console.error('[API Error] createUser:', error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+
+// Start server on port 5000 or 8080
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`=================================`);
     console.log(`Server is running on port ${PORT}`);
-    console.log(`API Login: http://localhost:${PORT}/api/login`);
-    console.log(`API CreateUser: http://localhost:${PORT}/api/users/createUser`);
+    console.log(`API Login: http://localhost:${PORT}/api/auth/login`);
+    console.log(`API Register: http://localhost:${PORT}/api/auth/register`);
     console.log(`=================================`);
 });

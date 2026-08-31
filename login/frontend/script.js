@@ -64,35 +64,30 @@ async function handleRegister(e) {
     const username = document.getElementById('reg-username').value.trim().toLowerCase();
     const password = document.getElementById('reg-password').value;
 
-    // Validations
+    // Validations (ตรวจความถูกต้อง)
     if (!fullname || !houseno || !username || !password) {
-        alert('กรุณากรอกข้อมูลให้ครบทุกช่อง');
-        return;
+        return alert('กรุณากรอกข้อมูลให้ครบทุกช่อง');
     }
+    if (username.length < 4) return alert('ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย 4 ตัวอักษร');
+    if (password.length < 6) return alert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
 
-    if (username.length < 4) {
-        alert('ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย 4 ตัวอักษร');
-        return;
-    }
-
-    if (password.length < 6) {
-        alert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
-        return;
-    }
-
-    // Prepare date fields
+    // เตรียมเรื่องวันที่
     const today = new Date();
     const nextYear = new Date(today);
     nextYear.setFullYear(today.getFullYear() + 1);
-
     const formatDate = (date) => date.toISOString().split('T')[0];
-    console.log(formatDate(today));
 
-    const payload = {
+    // 📦 Payload 1: สำหรับระบบ Login (เก็บแค่ Username / Password)
+    const authPayload = {
+        username: username,
+        password: password
+    };
+
+    // 📦 Payload 2: สำหรับเก็บข้อมูลลูกบ้าน (ข้อมูลอื่นๆ)
+    const dataPayload = {
         houseNumber: houseno,
         ownerName: fullname,
-        username: username,
-        password: password,
+        username: username, // ส่ง username ไปด้วยเพื่อไว้เชื่อมข้อมูลกับระบบ Login
         role: "member",
         registerDate: formatDate(today),
         memberStartDate: formatDate(today),
@@ -100,33 +95,43 @@ async function handleRegister(e) {
     };
 
     try {
-        const response = await fetch('https://api-node-iot.onrender.com/api/users/createUser', {
+        // 🚀 ยิง POST ที่ 1 : สร้างบัญชีสำหรับ Login (Localhost)
+        const authResponse = await fetch('http://localhost:8080/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(authPayload)
         });
+        const authResult = await authResponse.json();
 
-        const data = await response.json();
-        console.log(data);
-
-        // ตรวจสอบการตอบกลับ (ถ้าสำเร็จจะได้ true หรือ status ok)
-        if (response.ok && (data === true || data.success === true || data.status === 'success')) {
-            alert('ลงทะเบียนสมาชิกสำเร็จ!');
-            // Reset register form
-            document.getElementById('form-register').reset();
-            // Auto switch to login
-            switchTab('login');
-            document.getElementById('login-username').value = username;
-            document.getElementById('login-password').focus();
-        } else {
-            const errorMessage = typeof data === 'string' ? data : (data.message || 'ไม่สามารถลงทะเบียนได้ (ชื่อผู้ใช้หรือเลขที่บ้านอาจซ้ำซ้อน)');
-            alert(errorMessage);
+        // ถ้าสร้างบัญชีล็อกอินไม่สำเร็จ ให้หยุดการทำงานและแจ้งเตือนเลย
+        if (!authResponse.ok) {
+            throw new Error(authResult.message || 'ไม่สามารถสร้างบัญชีผู้ใช้ (Login) ได้');
         }
+
+        // 🚀 ยิง POST ที่ 2 : บันทึกข้อมูลลูกบ้านลง Cloud (Onrender)
+        const dataResponse = await fetch('https://api-node-iot.onrender.com/api/users/createUser', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataPayload)
+        });
+        const dataResult = await dataResponse.json();
+
+        if (!dataResponse.ok) {
+            throw new Error(dataResult.message || 'สร้างบัญชี Login สำเร็จ แต่ไม่สามารถบันทึกข้อมูลลูกบ้านได้');
+        }
+
+        // ถ้ายิงผ่านทั้ง 2 POST
+        alert('ลงทะเบียนสมาชิกสำเร็จ!');
+        document.getElementById('form-register').reset();
+        switchTab('login');
+        document.getElementById('login-username').value = username;
+        document.getElementById('login-password').focus();
+
     } catch (error) {
-        alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+        console.error("Registration Error:", error);
+        alert(error.message || 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
     }
 }
-
 /**
  * Handle Login Submission
  * @param {Event} e 
@@ -138,17 +143,14 @@ async function handleLogin(e) {
     const password = document.getElementById('login-password').value;
     try {
         // ส่งข้อมูลไปตรวจสอบที่หลังบ้าน (Backend API)
-        const response = await fetch(`http://localhost:8080/api/login`, {
+        const response = await fetch(`http://localhost:8080/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
 
         const data = await response.json();
-        console.log(response.status);
-        console.log(data.id);
-        console.log(data.token);
-        console.log(data.message);
+
         if (response.ok) {
             alert('เข้าสู่ระบบสำเร็จ!');
             // เก็บ Token และ ID ที่หลังบ้านส่งกลับมา
