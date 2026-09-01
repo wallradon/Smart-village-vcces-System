@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let allUsersData = [];       // เก็บข้อมูลลูกบ้านทั้งหมดจาก Cloud
     let allVehiclesData = [];    // เก็บข้อมูลรถยนต์ทั้งหมดจาก Cloud
     let allLogsData = [];        // เก็บประวัติการเข้า-ออกของรถยนต์จากกล้อง LPR
+    let currentActiveBarcode = localStorage.getItem('savedVisitorBarcode') || null;  // ดึงรหัสบาร์โค้ดเดิมที่เคยสร้างค้างไว้ (ถ้ามี)
 
     // ==========================================================
     // ส่วนที่ 3: ดึง Elements ทั้งหมดจากหน้า HTML
@@ -32,10 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Elements ระบบสร้าง Dynamic QR Code สำหรับ Visitor
     const qrModal = document.getElementById('qrModal');
     const btnCloseQr = document.getElementById('btnCloseQr');
+    const btnDeleteBarcode = document.getElementById('btnDeleteBarcode');
     const qrImageContainer = document.getElementById('qrImageContainer');
     const qrDataText = document.getElementById('qrDataText');
     const visitorCodeDisplay = document.getElementById('visitorCodeDisplay');
-
     // Elements ระบบลงทะเบียนรถยนต์
     const addVehicleModal = document.getElementById('addVehicleModal');
     const addVehicleForm = document.getElementById('addVehicleForm');
@@ -44,11 +45,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================================
     // ส่วนที่ 4: ฟังก์ชันจัดการ Helper และการแปลงข้อความ
     // ==========================================================
-    function generateRandomVisitorCode(length = 10) {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let res = '';
-        for (let i = 0; i < length; i++) {
-            res += chars.charAt(Math.floor(Math.random() * chars.length));
+    // ฟังก์ชันสุ่มรหัสตัวเลขล้วน 13 หลัก (จำลองรูปแบบบาร์โค้ดบัตร ปชช.)
+    function generateRandomVisitorCode(length = 13) {
+        const digits = '0123456789';
+        let res = digits.charAt(Math.floor(Math.random() * 9) + 1); // หลักแรกไม่เป็น 0
+        for (let i = 1; i < length; i++) {
+            res += digits.charAt(Math.floor(Math.random() * digits.length));
         }
         return res;
     }
@@ -179,6 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================================
     // ส่วนที่ 9: ระบบต่ออายุสมาชิก บันทึกลง Database จริง (PUT แบบป้องกันค่า Null)
     // ==========================================================
+
     async function renewMembership() {
         if (!currentUser) return;
 
@@ -187,7 +190,6 @@ document.addEventListener("DOMContentLoaded", () => {
         newExpObj.setFullYear(newExpObj.getFullYear() + 1);
         const newExpStr = newExpObj.toISOString().split('T')[0];
 
-        // ส่งข้อมูลเดิมของผู้ใช้กลับไปด้วยทั้งหมด ป้องกัน Database ล้างค่าทิ้งเป็น null
         const updatePayload = {
             houseNumber: currentUser.houseNumber || "",
             ownerName: currentUser.ownerName || "",
@@ -267,19 +269,20 @@ document.addEventListener("DOMContentLoaded", () => {
         let vehiclesHTML = '';
         if (myVehicles.length > 0) {
             myVehicles.forEach((v) => {
+                const typeText = v.type === "Motorcycle" ? "รถจักรยานยนต์" : "รถยนต์";
                 vehiclesHTML += `
                 <div class="headVlist">
                     <p class="Vlist">${v.plate} ${v.province ? `(${v.province})` : ''}</p>
-                    <p class="Vlist">${v.type || 'รถยนต์'}</p>
-                    <div style="display: flex; justify-content: center; gap: 8px; align-items: center;">
+                    <p class="Vlist">${typeText}</p>
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%;">
                         <a href="#" data-target="vehicleDetail" data-car-plate="${v.plate}" data-car-id="${v.id}">ดูประวัติ</a>
-                        <button type="button" class="btn-delete-v" data-v-id="${v.id}" data-v-plate="${v.plate}" style="background-color: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-family: Prompt; font-size: 13px;">🗑️ ลบ</button>
+                        <button type="button" class="btn-delete-v" data-v-id="${v.id}" data-v-plate="${v.plate}">🗑️ ลบ</button>
                     </div>
                 </div>`;
             });
         } else {
             vehiclesHTML = `<div class="headVlist">
-                                <p class="Vlist">ไม่มีข้อมูลรถยนต์ที่ลงทะเบียน</p>
+                                <p class="Vlist">ไม่มีข้อมูลยานพาหนะที่ลงทะเบียน</p>
                                 <p class="Vlist">-</p>
                                 <p></p>
                             </div>`;
@@ -307,7 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <div class="qr-section">
-                <button type="button" class="qr-btn-generate" id="btnGenerateVisitorQR">📱 สร้าง QR Code สำหรับแขกสแกนเข้าหมู่บ้าน</button>
+                <button type="button" class="qr-btn-generate" id="btnGenerateVisitorQR">🎫 สร้าง Barcode สำหรับแขกสแกนเข้าหมู่บ้าน</button>
             </div>
 
             <section class="vehicleUser">
@@ -323,10 +326,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 ${vehiclesHTML}
             </section>`;
 
-        document.getElementById('btnRenewMember')?.addEventListener('click', renewMembership);
-        document.getElementById('btnOpenAddVehicleModal')?.addEventListener('click', () => {
-            addVehicleModal.style.display = 'flex';
-        });
+        const btnRenewMember = document.getElementById('btnRenewMember');
+        if (btnRenewMember) btnRenewMember.addEventListener('click', renewMembership);
+
+        const btnOpenAddVehicleModal = document.getElementById('btnOpenAddVehicleModal');
+        if (btnOpenAddVehicleModal) {
+            btnOpenAddVehicleModal.addEventListener('click', () => {
+                addVehicleModal.style.display = 'flex';
+            });
+        }
 
         container.querySelectorAll('.btn-delete-v').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -334,25 +342,22 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        document.getElementById('btnGenerateVisitorQR')?.addEventListener('click', () => {
-            const randomCode = generateRandomVisitorCode(10);
-            const qrPayload = {
-                type: "VISITOR_PASS",
-                user_id: currentUser.id,
-                houseNumber: currentUser.houseNumber,
-                visitorCode: randomCode,
-                generateTime: new Date().toISOString(),
-                status: "ACTIVE"
-            };
+        const btnGenerateVisitorQR = document.getElementById('btnGenerateVisitorQR');
+        if (btnGenerateVisitorQR) {
+            btnGenerateVisitorQR.addEventListener('click', async () => {
+                if (!currentActiveBarcode) {
+                    currentActiveBarcode = generateRandomVisitorCode(13);
+                    localStorage.setItem('savedVisitorBarcode', currentActiveBarcode);
+                }
+                console.log("Generate new barcode:", currentActiveBarcode);
+                const barcodeUrl = `https://bwipjs-api.metafloor.com/?bcid=code128&text=${currentActiveBarcode}&scale=3&height=12&includetext`;
 
-            const jsonStr = JSON.stringify(qrPayload);
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(jsonStr)}`;
-
-            visitorCodeDisplay.textContent = randomCode;
-            qrImageContainer.innerHTML = `<img src="${qrUrl}" alt="Visitor QR Pass" style="width: 200px; height: 200px; border-radius: 8px; border: 2px solid var(--color-primary);">`;
-            qrDataText.textContent = `Payload: ${jsonStr}`;
-            qrModal.style.display = 'flex';
-        });
+                if (visitorCodeDisplay) visitorCodeDisplay.textContent = currentActiveBarcode;
+                if (qrImageContainer) qrImageContainer.innerHTML = `<img src="${barcodeUrl}" alt="Visitor Barcode 13 Digits" style="max-width: 100%; height: auto; border-radius: 4px;">`;
+                if (qrDataText) qrDataText.textContent = `Barcode Number: ${currentActiveBarcode} (บ้านเลขที่: ${currentUser.houseNumber || '-'})`;
+                if (qrModal) qrModal.style.display = 'flex';
+            });
+        }
     }
 
     function renderVehicleDetail(targetPlate, vehicleId) {
@@ -421,6 +426,38 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.removeItem('userId');
             currentUser = null;
             window.location.href = '../login/frontend/index.html';
+        });
+    }
+
+    // จัดการปุ่มยกเลิก/ลบบาร์โค้ด (Cancel / Delete Barcode)
+    if (btnDeleteBarcode) {
+        btnDeleteBarcode.addEventListener('click', async () => {
+            if (!currentActiveBarcode) return;
+
+            if (confirm(`คุณต้องการยกเลิกและลบบาร์โค้ดรหัส "${currentActiveBarcode}" ออกใช่หรือไม่?`)) {
+
+                // 🚩 จุดเชื่อมต่อ API ยิงลบออกจากฐานข้อมูลหลังบ้าน
+                /*
+                try {
+                    await fetch(`${DELETE_VISITOR_API}/${currentActiveBarcode}`, {
+                        method: 'DELETE'
+                    });
+                } catch (err) {
+                    console.error("ลบบาร์โค้ดจาก DB ไม่สำเร็จ:", err);
+                }
+                */
+
+                alert(`ยกเลิกและลบบาร์โค้ดรหัส ${currentActiveBarcode} เรียบร้อยแล้ว!`);
+
+                // ล้างค่าทิ้งเพื่อให้ครั้งหน้าสุ่มรหัสใหม่
+                localStorage.removeItem('savedVisitorBarcode');
+                currentActiveBarcode = null;
+
+                qrModal.style.display = 'none';
+                qrImageContainer.innerHTML = '';
+                visitorCodeDisplay.textContent = '-';
+                qrDataText.textContent = '';
+            }
         });
     }
 

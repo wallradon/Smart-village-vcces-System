@@ -1,6 +1,4 @@
 
-const API_BASE_URL = 'http://localhost:8080';
-
 
 /**
  * Switch between Login and Register tabs
@@ -95,20 +93,8 @@ async function handleRegister(e) {
     };
 
     try {
-        // 🚀 ยิง POST ที่ 1 : สร้างบัญชีสำหรับ Login (Localhost)
-        const authResponse = await fetch('http://localhost:8080/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(authPayload)
-        });
-        const authResult = await authResponse.json();
 
-        // ถ้าสร้างบัญชีล็อกอินไม่สำเร็จ ให้หยุดการทำงานและแจ้งเตือนเลย
-        if (!authResponse.ok) {
-            throw new Error(authResult.message || 'ไม่สามารถสร้างบัญชีผู้ใช้ (Login) ได้');
-        }
-
-        // 🚀 ยิง POST ที่ 2 : บันทึกข้อมูลลูกบ้านลง Cloud (Onrender)
+        // 🚀 ยิง POST ที่ 1 : บันทึกข้อมูลลูกบ้านลง Cloud (Onrender)
         const dataResponse = await fetch('https://api-node-iot.onrender.com/api/users/createUser', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -118,14 +104,40 @@ async function handleRegister(e) {
 
         if (!dataResponse.ok) {
             throw new Error(dataResult.message || 'สร้างบัญชี Login สำเร็จ แต่ไม่สามารถบันทึกข้อมูลลูกบ้านได้');
+        } else {
+            // ดึงข้อมูลจาก getUsers เพื่อหา ID ของลูกบ้านที่เพิ่งสร้าง
+            const usersRes = await fetch('https://api-node-iot.onrender.com/api/users/getUsers');
+            const usersList = await usersRes.json();
+
+            // หาข้อมูลที่ตรงกับบ้านเลขที่และชื่อ (reverse เพื่อหาข้อมูลที่เพิ่งสร้างล่าสุด)
+            const createdUser = usersList.reverse().find(u => u.houseNumber === houseno && u.ownerName === fullname);
+
+            if (!createdUser) {
+                throw new Error('บันทึกข้อมูลลูกบ้านสำเร็จ แต่ไม่สามารถดึง ID ของผู้ใช้งานได้');
+            }
+
+            // นำ ID ที่ได้ใส่ลงไปใน authPayload
+            authPayload.user_id = createdUser.id;
+
+            // 🚀 ยิง POST ที่ 2 : สร้างบัญชีสำหรับ Login
+            const authResponse = await fetch('https://api-node-iot.onrender.com/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(authPayload)
+            });
+            const authResult = await authResponse.json();
+            // ถ้าสร้างบัญชีล็อกอินไม่สำเร็จ ให้หยุดการทำงานและแจ้งเตือนเลย
+            if (!authResponse.ok) {
+                throw new Error(authResult.message || 'ไม่สามารถสร้างบัญชีผู้ใช้ (Login) ได้');
+            }
+            alert('ลงทะเบียนสมาชิกสำเร็จ!');
+            document.getElementById('form-register').reset();
+            switchTab('login');
+            document.getElementById('login-username').value = username;
+            document.getElementById('login-password').focus();
         }
 
         // ถ้ายิงผ่านทั้ง 2 POST
-        alert('ลงทะเบียนสมาชิกสำเร็จ!');
-        document.getElementById('form-register').reset();
-        switchTab('login');
-        document.getElementById('login-username').value = username;
-        document.getElementById('login-password').focus();
 
     } catch (error) {
         console.error("Registration Error:", error);
@@ -143,7 +155,7 @@ async function handleLogin(e) {
     const password = document.getElementById('login-password').value;
     try {
         // ส่งข้อมูลไปตรวจสอบที่หลังบ้าน (Backend API)
-        const response = await fetch(`http://localhost:8080/api/auth/login`, {
+        const response = await fetch(`https://api-node-iot.onrender.com/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
