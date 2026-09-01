@@ -26,7 +26,23 @@ const usersDB = [
         password: "$2b$10$bC3Zvj48pXPXPMu7eWpqTuYqTiI02mzrPMronJIM9T6x/Fe6soxPG" // 123456
     }
 ];
+// ตรวจสอบความถูกต้องของ JWT Token (Authentication Middleware)
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // ดึง Token ออกมาจาก "Bearer <TOKEN>"
 
+    if (!token) {
+        return res.status(401).json({ success: false, message: "Access token is missing" });
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ success: false, message: "Invalid or expired token" });
+        }
+        req.user = user;
+        next();
+    });
+}
 
 // Route for Login
 app.post('/api/auth/login', async (req, res) => {
@@ -114,6 +130,21 @@ app.post('/api/auth/register', async (req, res) => {
         console.error('[API Error] createUser:', error);
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
+});
+
+// Route for verifying token and getting current profile
+app.get('/api/auth/me', authenticateToken, (req, res) => {
+    const user = usersDB.find(u => u.id === req.user.userId);
+    if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+    }
+    return res.json({
+        success: true,
+        user: {
+            id: user.id,
+            username: user.username
+        }
+    });
 });
 
 // Start server on port 5000 or 8080
