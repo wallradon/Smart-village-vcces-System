@@ -49,6 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const addVehicleModal = document.getElementById('addVehicleModal');
     const addVehicleForm = document.getElementById('addVehicleForm');
     const btnCancelAddVehicle = document.getElementById('btnCancelAddVehicle');
+    // ==========================================================
+
     // check token
     async function checkAuth() {
         const token = localStorage.getItem('token');
