@@ -56,10 +56,10 @@
                 <p class="form-desc">กรุณากรอกข้อมูลเพื่อเข้าใช้งานระบบ Smart Village</p>
 
                 <div class="input-group">
-                    <label for="login-username">ชื่อผู้ใช้ หรือ เลขที่บ้าน</label>
+                    <label for="login-username">ชื่อผู้ใช้</label>
                     <div class="input-wrapper">
                         <i class="fa-solid fa-user input-icon"></i>
-                        <input type="text" id="login-username" placeholder="เช่น user123 หรือ 99/88" required
+                        <input type="text" id="login-username" placeholder="กรุณากรอกชื่อผู้ใช้" required
                             autocomplete="username">
                     </div>
                 </div>
@@ -147,6 +147,25 @@
             <p>&copy; 2026 Smart Village VCCES System. All rights reserved.</p>
         </footer>
     </main>
+
+    <!-- Custom Modal for Registration Success -->
+    <div id="success-modal" class="custom-modal">
+        <div class="modal-content">
+            <div class="modal-icon-wrapper">
+                <i class="fa-solid fa-circle-check modal-icon"></i>
+            </div>
+            <h2 class="modal-title">ลงทะเบียนสมาชิกสำเร็จ!</h2>
+            <p class="modal-desc">ไอดีของลูกบ้านคือ: <strong id="modal-user-id"></strong></p>
+            <div class="telegram-box">
+                <i class="fa-brands fa-telegram"></i>
+                <p>กรุณานำไอดีนี้ไปใช้ลงทะเบียนกับบอท Telegram</p>
+                <a href="https://t.me/SmartVillageVCCESBot" target="_blank" class="telegram-link">@SmartVillageVCCESBot</a>
+            </div>
+            <button class="btn-submit modal-close-btn" onclick="closeSuccessModal()">
+                <span>ตกลง</span>
+            </button>
+        </div>
+    </div>
 
     <!-- Custom Script -->
     <script src="script.js"></script>
