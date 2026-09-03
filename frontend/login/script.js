@@ -1,6 +1,17 @@
 
 
 /**
+ * Wave Loader Controls
+ */
+function showLoader() {
+    document.getElementById('wave-loader-overlay').classList.add('show');
+}
+
+function hideLoader() {
+    document.getElementById('wave-loader-overlay').classList.remove('show');
+}
+
+/**
  * Switch between Login and Register tabs
  * @param {string} tabName - 'login' or 'register'
  */
@@ -93,6 +104,8 @@ async function handleRegister(e) {
     };
 
     try {
+        showLoader();
+
 
         // 🚀 ยิง POST ที่ 1 : บันทึกข้อมูลลูกบ้านลง Cloud (Onrender)
         const dataResponse = await fetch('https://api-node-iot.onrender.com/api/users/createUser', {
@@ -130,12 +143,12 @@ async function handleRegister(e) {
             if (!authResponse.ok) {
                 throw new Error(authResult.message || 'ไม่สามารถสร้างบัญชีผู้ใช้ (Login) ได้');
             }
-            
+
             // แสดง Custom Modal แทน Alert
             document.getElementById('modal-user-id').textContent = createdUser.id;
             document.getElementById('success-modal').classList.add('show');
             document.getElementById('form-register').reset();
-            
+
             // เก็บ username ไว้ใช้ตอนปิด modal เพื่อไปใส่ในหน้า login
             window.recentRegisteredUsername = username;
         }
@@ -145,6 +158,8 @@ async function handleRegister(e) {
     } catch (error) {
         console.error("Registration Error:", error);
         alert(error.message || 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+    } finally {
+        hideLoader();
     }
 }
 /**
@@ -157,6 +172,7 @@ async function handleLogin(e) {
     const username = document.getElementById('login-username').value.trim().toLowerCase();
     const password = document.getElementById('login-password').value;
     try {
+        showLoader();
         // ส่งข้อมูลไปตรวจสอบที่หลังบ้าน (Backend API)
         const response = await fetch(`https://api-node-iot.onrender.com/api/auth/login`, {
             method: 'POST',
@@ -167,7 +183,7 @@ async function handleLogin(e) {
         const data = await response.json();
 
         if (response.ok) {
-            alert('เข้าสู่ระบบสำเร็จ!');
+            // alert('เข้าสู่ระบบสำเร็จ!');
             // เก็บ Token และ ID ที่หลังบ้านส่งกลับมา
             console.log('token:', data.token);
             localStorage.setItem('token', data.token);
@@ -200,6 +216,8 @@ async function handleLogin(e) {
         }
     } catch (error) {
         alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+    } finally {
+        hideLoader();
     }
 }
 
