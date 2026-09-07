@@ -127,15 +127,18 @@ function renderUserPage(target, params) {
     }
 
     // 5. If download is complete, show data based on target page
-    if (target === "user") {
-        renderUserList(UsersData);
-    } else if (target === "userDetail") {
-        renderUserDetail(Number(params.id));
-    } else if (target === "vehicleDetail") {
-        renderEachVehicle(Number(params.id), String(params.carPlate));
-    } else if (target === "vehicle") {
-        renderVehicleList(VeLog);
-    }
+    const renderRoutes = {
+        user: () => renderUserList(UsersData),
+        userDetail: (params) => renderUserDetail(Number(params.id)),
+        vehicleDetail: (params) => renderEachVehicle(Number(params.id), String(params.carPlate)),
+        vehicle: () => renderVehicleList(VeLog)
+    };
+
+    if (renderRoutes[target]) {
+        renderRoutes[target](params);
+    } else {
+        console.warn(`No render function found for target: ${target}`);
+    };
 }
 
 // ===================== Render VEHICLE DATA Page =====================
@@ -151,31 +154,20 @@ function renderVehicleList(data) {
     let foundCount = 0; // Count found vehicles
     // Loop to check each user data
     data.forEach(d => {
-        // Filter only users with registered vehicles
         const plate = d.plate || "-"; // Vehicle plate
         const type = d.type || "-";   // Vehicle type (e.g. car, motorcycle)
-        if (d.time_in) {
-            foundCount++;
-            const recordText = `In: ${d.time_in ?? '-'} | Out: ${d.time_out ?? '-'}`;
-            htmlContent += `
-                        <div class="User VehicleRow">
-                            <h2>${type}</h2>
-                            <h2>${plate}</h2>
-                            <h2>${recordText}</h2>
-                        </div>
-                        `;
-        } else {
-            // If no in/out records, show vehicle details and alert
-            foundCount++;
-            htmlContent += `
-                    <div class="User VehicleRow">
-                        <h2>${type}</h2>
-                        <h2>${plate}</h2>
-                        <h2>No entry/exit records</h2>
-                    </div>
-                    `;
-        }
-
+        
+        foundCount++;
+        // ใช้ Ternary Operator และ Optional Chaining เพื่อกำหนดข้อความในบรรทัดเดียว
+        const recordText = d.time_in ? `In: ${d.time_in ?? '-'} | Out: ${d.time_out ?? '-'}` : "No entry/exit records";
+        
+        htmlContent += `
+        <div class="User VehicleRow">
+            <h2>${type}</h2>
+            <h2>${plate}</h2>
+            <h2>${recordText}</h2>
+        </div>
+        `;
     });
 
     // If no vehicles found, show alert
