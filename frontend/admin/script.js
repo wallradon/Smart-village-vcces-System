@@ -194,11 +194,13 @@ function renderUserList(users) {
     // Loop to create HTML for users
     users.filter(user => user.role === "member").forEach((user, index) => {
         htmlContent += `
-        <div class="User">
+        <div class="User" data-id="${user.id}" data-target="userDetail" style="cursor: pointer;">
             <h2>${index + 1}</h2>
             <h2>${user.houseNumber}</h2>
-            <!-- Link to see user details using data-id -->
-            <a href="#" data-id="${user.id}" data-target="userDetail" >More info</a>
+            <!-- Action buttons -->
+            <div class="user-actions">
+                <button type="button" data-id="${user.id}" data-house-number="${user.houseNumber}" class="delete-user-btn">ลบข้อมูล (Delete)</button>
+            </div>
         </div>
         `;
     });
@@ -353,14 +355,36 @@ function renderEachVehicle(userId, vehiclePlate) {
         </div>
     </div>
     </div>`;
-    vehicleDetailContainer.innerHTML = htmlContent;
+        vehicleDetailContainer.innerHTML = htmlContent;
 }
 
 // ===================== Global Click Event Delegation =====================
 // Use event delegation in .main-content to avoid adding new event listeners
 document.querySelector('.main-content').addEventListener('click', (e) => {
-    // Check if clicked element is a link/button with data-target
-    const link = e.target.closest('a[data-target]');
+    // If clicked on the delete button, prevent default and do not navigate
+    const deleteBtn = e.target.closest('.delete-user-btn');
+    if (deleteBtn) {
+        e.preventDefault();
+        e.stopPropagation(); // Stop event bubbling to parent .User div
+
+        const userId = deleteBtn.dataset.id;
+        const houseNum = deleteBtn.dataset.houseNumber || userId;
+        
+        // Use custom popup instead of native confirm
+        showConfirmPopup(
+            'ยืนยันการลบข้อมูล', 
+            `คุณต้องการลบข้อมูลลูกบ้าน เลขที่บ้าน ${houseNum} ใช่หรือไม่?`, 
+            () => {
+                console.log(`Deleting user ID: ${userId}, House: ${houseNum}`);
+                // TODO: Call delete API here
+            }
+        );
+        
+        return; // Exit here so it doesn't try to navigate
+    }
+
+    // Check if clicked element is an element with data-target
+    const link = e.target.closest('[data-target]');
     if (!link) return; // Skip if clicked elsewhere
 
     e.preventDefault(); // Prevent default behavior
@@ -485,5 +509,35 @@ if (logoutBtn) {
 
         // Redirect to login page
         window.location.href = '../../index.html';
+    });
+}
+
+// ===================== Custom Confirm Popup =====================
+function showConfirmPopup(title, message, onConfirm) {
+    const popup = document.getElementById('custom-confirm-popup');
+    if (!popup) return;
+    
+    const popupTitle = document.getElementById('popup-title');
+    const popupMessage = document.getElementById('popup-message');
+    const confirmBtn = document.getElementById('popup-confirm-btn');
+    const cancelBtn = document.getElementById('popup-cancel-btn');
+
+    popupTitle.textContent = title;
+    popupMessage.textContent = message;
+    popup.classList.add('active');
+
+    // Remove old event listeners by cloning
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    const newCancelBtn = cancelBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+    newConfirmBtn.addEventListener('click', () => {
+        popup.classList.remove('active');
+        if (onConfirm) onConfirm();
+    });
+
+    newCancelBtn.addEventListener('click', () => {
+        popup.classList.remove('active');
     });
 }
